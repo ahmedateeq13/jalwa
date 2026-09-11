@@ -1,0 +1,4274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#160b06">
+<meta name="description" content="JALWA PWA">
+<link rel="manifest" href="manifest.json">
+<title>JALWA</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+  --bg:#090504;
+  --panel:#160b06;
+  --panel2:#211008;
+  --gold:#ffd54a;
+  --gold2:#ffb300;
+  --text:#fff8e7;
+  --muted:#cdb184;
+  --line:rgba(255,193,7,.22);
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(180deg,#090504,#140905);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.container{
+  width:min(1100px,94%);
+  margin:auto;
+}
+
+
+/* =========================
+   AUTH
+========================= */
+
+.auth-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.auth-box{
+  width:min(430px,100%);
+  background:rgba(22,11,6,.96);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:26px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+.logo{
+  text-align:center;
+  font-size:38px;
+  font-weight:900;
+  letter-spacing:4px;
+  color:var(--gold);
+  margin-bottom:7px;
+}
+
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:22px;
+}
+
+.input,
+.label{
+  display:block;
+  width:100%;
+}
+
+.input{
+  background:#0e0704;
+  border:1px solid rgba(255,193,7,.25);
+  color:#fff;
+  padding:13px 14px;
+  border-radius:12px;
+  outline:none;
+  margin:7px 0 14px;
+}
+
+.input:focus{
+  border-color:var(--gold);
+}
+
+.label{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.gold-btn,
+.plan-btn{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:13px 16px;
+  background:linear-gradient(135deg,#ffd54a,#ffad00);
+  color:#160b06;
+  font-weight:800;
+}
+
+.link-btn{
+  background:none;
+  border:0;
+  color:var(--gold);
+  margin-top:15px;
+  width:100%;
+}
+
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(9,5,4,.94);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+
+.topbar-inner{
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.brand{
+  font-weight:900;
+  letter-spacing:3px;
+  color:var(--gold);
+  font-size:22px;
+}
+
+.icon-btn{
+  background:#211008;
+  border:1px solid var(--line);
+  color:var(--gold);
+  border-radius:11px;
+  padding:9px 12px;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main{
+  padding:18px 0 100px;
+}
+
+.hero{
+  background:linear-gradient(135deg,#211008,#100704);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:16px;
+}
+
+.hero small{
+  color:var(--muted);
+}
+
+.hero h1{
+  font-size:25px;
+  margin:6px 0;
+}
+
+.balance{
+  font-size:31px;
+  color:var(--gold);
+  font-weight:900;
+  margin-top:8px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.info-card,
+.plan-card,
+.menu-card{
+  background:rgba(22,11,6,.94);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+
+.info-title{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:7px;
+}
+
+.info-value{
+  font-size:20px;
+  font-weight:800;
+}
+
+.section-title{
+  font-size:20px;
+  margin:24px 0 12px;
+  color:var(--gold);
+}
+
+.plans{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.plan-name{
+  font-weight:900;
+  color:var(--gold);
+  font-size:18px;
+}
+
+.plan-amount{
+  font-size:24px;
+  font-weight:900;
+  margin:8px 0;
+}
+
+.plan-days{
+  color:var(--muted);
+  font-size:13px;
+  margin:4px 0;
+}
+
+.daily-profit{
+  font-size:13px;
+  color:#ffe49a;
+  margin-top:8px;
+}
+
+.status{
+  display:inline-block;
+  margin-top:10px;
+  padding:6px 9px;
+  border-radius:8px;
+  background:rgba(255,193,7,.10);
+  border:1px solid var(--line);
+  font-size:12px;
+  color:var(--gold);
+}
+
+.plan-btn{
+  margin-top:13px;
+  padding:11px;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.round-action{
+  border:1px solid var(--line);
+  background:#211008;
+  color:var(--gold);
+  border-radius:12px;
+  padding:12px;
+  font-weight:700;
+}
+
+.round-action span{
+  font-size:18px;
+}
+
+
+/* =========================
+   REFERRAL
+========================= */
+
+.ref-card{
+  background:rgba(22,11,6,.94);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+
+.ref-link{
+  background:#0e0704;
+  border:1px solid rgba(255,193,7,.25);
+  color:#fff;
+  padding:13px 14px;
+  border-radius:12px;
+  margin:9px 0 12px;
+  word-break:break-all;
+}
+
+
+/* =========================
+   ADMIN APPROVAL
+========================= */
+
+.approval-card{
+  background:rgba(22,11,6,.94);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+
+.approval-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.approval-row:last-child{
+  border-bottom:0;
+}
+
+
+/* =========================
+   SIDE MENU
+========================= */
+
+.side-menu{
+  position:fixed;
+  top:0;
+  left:-310px;
+  width:290px;
+  height:100vh;
+  background:#120805;
+  border-right:1px solid var(--line);
+  z-index:50;
+  padding:18px;
+  transition:.25s;
+  overflow:auto;
+}
+
+.side-menu.open{
+  left:0;
+}
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:40;
+}
+
+.menu-close{
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:#211008;
+  border:1px solid var(--line);
+  color:var(--gold);
+  border-radius:10px;
+  padding:7px 11px;
+  font-size:20px;
+}
+
+.menu-title{
+  color:var(--gold);
+  font-size:23px;
+  font-weight:900;
+  letter-spacing:3px;
+  margin:5px 0 22px;
+}
+
+.menu-item{
+  width:100%;
+  text-align:left;
+  background:#1d0d07;
+  border:1px solid var(--line);
+  color:#fff3d0;
+  padding:13px;
+  border-radius:11px;
+  margin-bottom:8px;
+}
+
+
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+  width:min(1100px,94%);
+  margin:auto;
+}
+
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:rgba(9,5,4,.96);
+  border-top:1px solid var(--line);
+  z-index:25;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+}
+
+.nav-btn{
+  background:none;
+  border:0;
+  color:var(--muted);
+  padding:8px 4px;
+  font-size:11px;
+}
+
+.nav-btn.active{
+  color:var(--gold);
+}
+
+.nav-icon{
+  display:block;
+  font-size:20px;
+  margin-bottom:2px;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  z-index:100;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+}
+
+.modal-box{
+  width:min(520px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:#160b06;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px;
+}
+
+.modal-box h2{
+  margin-bottom:15px;
+  color:var(--gold);
+}
+
+.payment-box{
+  background:#0d0704;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:15px;
+  text-align:center;
+  margin-bottom:13px;
+}
+
+.method{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.payment-number{
+  font-size:25px;
+  font-weight:900;
+  color:var(--gold);
+  margin:7px 0;
+}
+
+.payment-name{
+  font-weight:700;
+}
+
+.modal-note{
+  background:rgba(255,193,7,.07);
+  border:1px solid var(--line);
+  padding:12px;
+  border-radius:12px;
+  color:#ead8b5;
+  font-size:12px;
+  line-height:1.5;
+  margin-bottom:14px;
+}
+
+.modal-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:5px;
+}
+
+.cancel-btn{
+  border:1px solid var(--line);
+  background:#211008;
+  color:#fff;
+  padding:13px;
+  border-radius:12px;
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  display:none;
+  position:fixed;
+  left:50%;
+  bottom:82px;
+  transform:translateX(-50%);
+  z-index:200;
+  background:#251007;
+  border:1px solid var(--gold2);
+  color:#fff3ce;
+  padding:12px 16px;
+  border-radius:12px;
+  max-width:90%;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+
+/* =========================
+   REQUEST HISTORY
+========================= */
+
+.request-list{
+  display:grid;
+  gap:10px;
+}
+
+.request-item{
+  background:#1a0c07;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:13px;
+}
+
+.request-item b{
+  color:var(--gold);
+}
+
+
+/* =========================
+   PACKAGE TRACKING
+========================= */
+
+.my-packages-grid{
+  display:grid;
+  gap:14px;
+}
+
+.package-box{
+  background:#160b06;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+
+.package-box-title{
+  font-size:18px;
+  font-weight:900;
+  color:var(--gold);
+  margin-bottom:8px;
+}
+
+.active-package-box{
+  margin-top:12px;
+  background:#0d0704;
+  border:1px solid rgba(255,193,7,.35);
+  border-radius:14px;
+  padding:15px;
+}
+
+.active-title{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:7px;
+  letter-spacing:.5px;
+}
+
+.active-badge{
+  display:inline-block;
+  padding:6px 9px;
+  border-radius:8px;
+  background:rgba(255,193,7,.10);
+  border:1px solid var(--line);
+  font-size:12px;
+  color:var(--gold);
+  font-weight:800;
+}
+
+.countdown-box{
+  margin-top:12px;
+  padding:13px;
+  border-radius:12px;
+  background:rgba(255,193,7,.07);
+  border:1px solid var(--line);
+  text-align:center;
+}
+
+.countdown-label{
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.package-countdown{
+  font-size:25px;
+  font-weight:900;
+  color:var(--gold);
+  letter-spacing:1px;
+}
+
+.profit-days{
+  margin-top:9px;
+  color:#ffe49a;
+  font-size:12px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+  .grid,
+  .plans{
+    grid-template-columns:1fr;
+  }
+
+  .actions{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .hero h1{
+    font-size:21px;
+  }
+
+  .nav-btn{
+    font-size:10px;
+  }
+
+  .topbar-inner{
+    gap:6px;
+  }
+
+  .brand{
+    font-size:19px;
+  }
+
+  .icon-btn{
+    padding:8px 9px;
+    font-size:12px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+
+<!-- =========================
+     AUTH
+========================= -->
+
+<div id="authView" class="auth-wrap">
+
+  <div class="auth-box">
+
+    <div class="logo">
+      JALWA
+    </div>
+
+    <div class="subtitle">
+      JALWA PWA
+    </div>
+
+
+    <!-- LOGIN -->
+
+    <div id="loginBox">
+
+      <label class="label">
+        Phone Number
+      </label>
+
+      <input
+        id="loginPhone"
+        class="input"
+        type="tel"
+        placeholder="03XXXXXXXXX"
+      >
+
+      <label class="label">
+        Password
+      </label>
+
+      <input
+        id="loginPassword"
+        class="input"
+        type="password"
+        placeholder="Password"
+      >
+
+      <button
+        class="gold-btn"
+        onclick="login()"
+      >
+        LOGIN
+      </button>
+
+      <button
+        class="link-btn"
+        onclick="showRegister()"
+      >
+        Create new account
+      </button>
+
+    </div>
+
+
+    <!-- REGISTER -->
+
+    <div id="registerBox" class="hidden">
+
+      <label class="label">
+        Name
+      </label>
+
+      <input
+        id="regName"
+        class="input"
+        type="text"
+        placeholder="Your name"
+      >
+
+      <label class="label">
+        Phone Number
+      </label>
+
+      <input
+        id="regPhone"
+        class="input"
+        type="tel"
+        placeholder="03XXXXXXXXX"
+      >
+
+      <label class="label">
+        Password
+      </label>
+
+      <input
+        id="regPassword"
+        class="input"
+        type="password"
+        placeholder="Password"
+      >
+
+      <label class="label">
+        Referral Code (optional)
+      </label>
+
+      <input
+        id="regReferral"
+        class="input"
+        type="text"
+        placeholder="Referral code"
+      >
+
+      <button
+        class="gold-btn"
+        onclick="register()"
+      >
+        REGISTER
+      </button>
+
+      <button
+        class="link-btn"
+        onclick="showLogin()"
+      >
+        Already have an account? Login
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     APP
+========================= -->
+
+<div id="appView" class="hidden">
+
+
+  <!-- TOP BAR -->
+
+  <header class="topbar">
+
+    <div class="container topbar-inner">
+
+      <button
+        class="icon-btn"
+        onclick="openMenu()"
+      >
+        ☰
+      </button>
+
+      <div class="brand">
+        JALWA
+      </div>
+
+      <div
+        class="icon-btn"
+        style="cursor:default;"
+      >
+        Rs
+        <span id="topBalance">0</span>
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="content">
+
+
+    <!-- =========================
+         HOME
+    ========================= -->
+
+    <section id="homeSection">
+
+
+      <div class="hero">
+
+        <h1>
+          Welcome to JALWA
+        </h1>
+
+        <p style="color:#cdb184;">
+          Package management dashboard
+        </p>
+
+        <!-- INSTALL APP -->
+
+        <button
+          class="gold-btn"
+          style="margin-top:15px;"
+          onclick="installApp()"
+        >
+          📲 INSTALL APP
+        </button>
+
+      </div>
+
+
+      <!-- BALANCE -->
+
+      <div class="balance-card">
+
+        <div class="balance-label">
+          Available Balance
+        </div>
+
+        <div class="balance">
+          Rs
+          <span id="balance">
+            0
+          </span>
+        </div>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+
+      <div class="actions">
+
+        <button
+          class="round-action"
+          onclick="openRequest('deposit')"
+        >
+          <span>＋</span>
+          DEPOSIT
+        </button>
+
+        <button
+          class="round-action"
+          onclick="openRequest('withdraw')"
+        >
+          <span>↗</span>
+          WITHDRAW
+        </button>
+
+      </div>
+
+
+      <!-- REFERRAL -->
+
+      <div class="section-title">
+        Referral
+      </div>
+
+      <div class="ref-card">
+
+        <div style="font-size:12px;color:#cdb184;">
+          Your referral link
+        </div>
+
+        <div
+          id="refLink"
+          class="ref-link"
+        >
+          -
+        </div>
+
+        <button
+          class="gold-btn"
+          onclick="copyRef()"
+        >
+          COPY REFERRAL
+        </button>
+
+      </div>
+
+
+      <!-- PROFIT SUMMARY -->
+
+      <div class="section-title">
+        Profit Summary
+      </div>
+
+      <div class="grid">
+
+        <div class="info-card">
+
+          <div class="info-title">
+            TODAY PROFIT
+          </div>
+
+          <div
+            id="todayProfit"
+            class="info-value"
+          >
+            Rs 0
+          </div>
+
+        </div>
+
+        <div class="info-card">
+
+          <div class="info-title">
+            TOTAL PACKAGE PROFIT
+          </div>
+
+          <div
+            id="totalProfit"
+            class="info-value"
+          >
+            Rs 0
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- MY PACKAGES -->
+
+      <section id="myPackagesSection">
+
+        <div class="section-title">
+          My Packages
+        </div>
+
+        <div
+          id="myPackages"
+          class="my-packages-grid"
+        ></div>
+
+      </section>
+
+
+      <!-- PLANS -->
+
+      <section id="plansSection">
+
+        <div class="section-title">
+          Available Packages
+        </div>
+
+        <div
+          id="plans"
+          class="plans"
+        ></div>
+
+      </section>
+
+
+      <!-- ADMIN APPROVAL -->
+
+      <div class="section-title">
+        Admin Approval
+      </div>
+
+      <div class="approval-card">
+
+        <div class="modal-note">
+
+          This section is for package approval testing.
+          It does not process real payments.
+
+        </div>
+
+        <label class="label">
+          Select Plan
+        </label>
+
+        <select
+          id="approvalPlan"
+          class="input"
+        >
+        </select>
+
+        <button
+          class="gold-btn"
+          onclick="approveSelectedPlan()"
+        >
+          ADMIN APPROVE
+        </button>
+
+      </div>
+
+
+    </section>
+
+
+    <!-- =========================
+         ACCOUNT
+    ========================= -->
+
+    <section
+      id="accountSection"
+      class="hidden"
+    >
+
+      <div class="section-title">
+        My Account
+      </div>
+
+      <div class="info-card">
+
+        <div class="info-row">
+
+          <span>
+            Name
+          </span>
+
+          <span id="accountName">
+            -
+          </span>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Phone
+          </span>
+
+          <span id="accountPhone">
+            -
+          </span>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Referral
+          </span>
+
+          <span id="accountReferral">
+            -
+          </span>
+
+        </div>
+
+        <div class="info-row">
+
+          <span>
+            Balance
+          </span>
+
+          <span>
+            Rs
+            <span id="accountBalance">
+              0
+            </span>
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- REQUEST STATUS -->
+
+      <div class="section-title">
+        Request Status
+      </div>
+
+      <div
+        id="requestHistory"
+        class="request-list"
+      >
+      </div>
+
+
+      <button
+        class="gold-btn"
+        style="margin-top:15px;"
+        onclick="logout()"
+      >
+        LOGOUT
+      </button>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =========================
+       BOTTOM NAV
+  ========================= -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-btn active"
+      onclick="showHome()"
+    >
+
+      <span class="nav-icon">
+        ⌂
+      </span>
+
+      Home
+
+    </button>
+
+
+    <button
+      class="nav-btn"
+      onclick="openRequest('deposit')"
+    >
+
+      <span class="nav-icon">
+        ＋
+      </span>
+
+      Deposit
+
+    </button>
+
+
+    <button
+      class="nav-btn"
+      onclick="scrollToSection('plansSection')"
+    >
+
+      <span class="nav-icon">
+        ▣
+      </span>
+
+      Plans
+
+    </button>
+
+
+    <button
+      class="nav-btn"
+      onclick="openRequest('withdraw')"
+    >
+
+      <span class="nav-icon">
+        ↗
+      </span>
+
+      Withdraw
+
+    </button>
+
+
+    <button
+      class="nav-btn"
+      onclick="showAccount()"
+    >
+
+      <span class="nav-icon">
+        ♙
+      </span>
+
+      Account
+
+    </button>
+
+  </nav>
+
+
+</div>
+
+
+<!-- =========================
+     SIDE MENU
+========================= -->
+
+<div
+  id="overlay"
+  class="overlay hidden"
+  onclick="closeMenu()"
+>
+</div>
+
+
+<aside
+  id="sideMenu"
+  class="side-menu"
+>
+
+  <button
+    class="menu-close"
+    onclick="closeMenu()"
+  >
+    ×
+  </button>
+
+  <div class="menu-title">
+    JALWA
+  </div>
+
+
+  <button
+    class="menu-item"
+    onclick="scrollToSection('homeSection')"
+  >
+    🏠 Home
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="openRequest('deposit');closeMenu()"
+  >
+    💰 Deposit
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="openRequest('withdraw');closeMenu()"
+  >
+    💸 Withdraw
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="scrollToSection('myPackagesSection')"
+  >
+    📦 My Packages
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="scrollToSection('plansSection')"
+  >
+    📦 Plans
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="openHistory()"
+  >
+    📋 Request Status
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="contactAdmin()"
+  >
+    👤 Contact Admin
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="joinChannel()"
+  >
+    📢 Join Channel
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="showAccount()"
+  >
+    ⚙️ Account
+  </button>
+
+
+  <button
+    class="menu-item"
+    onclick="logout()"
+  >
+    🚪 Logout
+  </button>
+
+</aside>
+
+
+<!-- =========================
+     REQUEST MODAL
+========================= -->
+
+<div
+  id="requestModal"
+  class="modal hidden"
+>
+
+  <div class="modal-box">
+
+    <h2 id="requestTitle">
+      Deposit Request
+    </h2>
+
+
+    <!-- DEPOSIT -->
+
+    <div id="depositFields">
+
+      <div class="payment-box">
+
+        <div class="method">
+          Easypaisa
+        </div>
+
+        <div class="payment-number">
+          03221619080
+        </div>
+
+        <div class="payment-name">
+          Akhtari Bibi
+        </div>
+
+      </div>
+
+
+      <div class="modal-note">
+
+        <b>Deposit:</b>
+        <br>
+
+        Easypaisa number and account name above are shown
+        for the payment request.
+        This app does not process real payments.
+
+      </div>
+
+
+      <label class="label">
+        Amount
+      </label>
+
+      <input
+        id="reqAmount"
+        class="input"
+        type="number"
+        min="1"
+        placeholder="Enter Amount"
+      >
+
+
+      <label class="label">
+        Transaction / Reference ID
+      </label>
+
+      <input
+        id="reqRef"
+        class="input"
+        type="text"
+        placeholder="Optional reference ID"
+      >
+
+
+      <label class="label">
+        Payment Screenshot
+      </label>
+
+      <input
+        id="reqShot"
+        class="input"
+        type="file"
+        accept="image/*"
+      >
+
+    </div>
+
+
+    <!-- WITHDRAW -->
+
+    <div
+      id="withdrawFields"
+      class="hidden"
+    >
+
+      <div class="modal-note">
+
+        Withdrawal is a
+        <b>PENDING request</b>.
+
+        Minimum withdrawal is
+        <b>Rs 65</b>.
+
+        No real bank transaction is performed
+        by this HTML app.
+
+      </div>
+
+
+      <label class="label">
+        Withdrawal Method
+      </label>
+
+      <select
+        id="wdMethod"
+        class="input"
+      >
+
+        <option value="">
+          Select Bank / Wallet
+        </option>
+
+        <option value="JazzCash">
+          JazzCash
+        </option>
+
+        <option value="Easypaisa">
+          Easypaisa
+        </option>
+
+        <option value="HBL">
+          HBL
+        </option>
+
+        <option value="UBL">
+          UBL
+        </option>
+
+        <option value="MCB Bank">
+          MCB Bank
+        </option>
+
+        <option value="Allied Bank">
+          Allied Bank
+        </option>
+
+        <option value="Meezan Bank">
+          Meezan Bank
+        </option>
+
+        <option value="Bank Alfalah">
+          Bank Alfalah
+        </option>
+
+        <option value="Faysal Bank">
+          Faysal Bank
+        </option>
+
+        <option value="Askari Bank">
+          Askari Bank
+        </option>
+
+        <option value="Bank Al Habib">
+          Bank Al Habib
+        </option>
+
+        <option value="Habib Metropolitan Bank">
+          Habib Metropolitan Bank
+        </option>
+
+        <option value="Soneri Bank">
+          Soneri Bank
+        </option>
+
+        <option value="Standard Chartered Pakistan">
+          Standard Chartered Pakistan
+        </option>
+
+        <option value="JS Bank">
+          JS Bank
+        </option>
+
+        <option value="Dubai Islamic Bank Pakistan">
+          Dubai Islamic Bank Pakistan
+        </option>
+
+        <option value="Silkbank">
+          Silkbank
+        </option>
+
+        <option value="National Bank of Pakistan">
+          National Bank of Pakistan
+        </option>
+
+        <option value="The Bank of Punjab">
+          The Bank of Punjab
+        </option>
+
+        <option value="Sindh Bank">
+          Sindh Bank
+        </option>
+
+        <option value="ZTBL">
+          ZTBL
+        </option>
+
+      </select>
+
+
+      <label class="label">
+        Amount
+      </label>
+
+      <input
+        id="wdAmount"
+        class="input"
+        type="number"
+        min="65"
+        placeholder="Minimum Rs 65"
+      >
+
+
+      <label class="label">
+        Account / Mobile Number
+      </label>
+
+      <input
+        id="wdAccount"
+        class="input"
+        type="text"
+        placeholder="Account or mobile number"
+      >
+
+
+      <label class="label">
+        Account Holder Name
+      </label>
+
+      <input
+        id="wdName"
+        class="input"
+        type="text"
+        placeholder="Account holder name"
+      >
+
+    </div>
+
+
+    <!-- MODAL BUTTONS -->
+
+    <div class="modal-actions">
+
+      <button
+        class="cancel-btn"
+        onclick="closeModals()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="gold-btn"
+        onclick="submitRequest()"
+      >
+        SUBMIT
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+  id="toast"
+  class="toast"
+>
+</div>
+
+
+<script>
+
+
+/* =========================
+   PLANS
+========================= */
+
+const plans = [
+
+  [1,260,60],
+
+  [2,410,60],
+
+  [3,640,60],
+
+  [4,1010,60],
+
+  [5,1580,60],
+
+  [6,2480,60],
+
+  [7,3890,60],
+
+  [8,6100,60],
+
+  [9,9580,60],
+
+  [10,15040,60],
+
+  [11,23610,60],
+
+  [12,37060,60],
+
+  [13,58180,60],
+
+  [14,91320,60],
+
+  [15,143340,60],
+
+  [16,225000,60]
+
+];
+
+
+let requestType = "deposit";
+
+let selectedPlanNumber = null;
+
+
+/* =========================
+   AUTH
+========================= */
+
+function showRegister(){
+
+  document
+    .getElementById("loginBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("registerBox")
+    .classList.remove("hidden");
+
+}
+
+
+function showLogin(){
+
+  document
+    .getElementById("registerBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginBox")
+    .classList.remove("hidden");
+
+}
+
+
+function register(){
+
+  const name =
+    document.getElementById("regName").value.trim();
+
+  const phone =
+    document.getElementById("regPhone").value.trim();
+
+  const password =
+    document.getElementById("regPassword").value;
+
+  const referral =
+    document.getElementById("regReferral").value.trim();
+
+
+  if(
+    !name ||
+    !phone ||
+    !password
+  ){
+
+    toast(
+      "Please complete all required fields."
+    );
+
+    return;
+
+  }
+
+
+  const user = {
+
+    name:name,
+
+    phone:phone,
+
+    password:password,
+
+    referral:
+      referral ||
+      "JALWA" +
+      Math.floor(
+        1000 +
+        Math.random()*9000
+      ),
+
+    balance:0
+
+  };
+
+
+  localStorage.setItem(
+    "jalwaUser",
+    JSON.stringify(user)
+  );
+
+
+  toast(
+    "Registration successful."
+  );
+
+
+  setTimeout(
+    () => {
+      showApp();
+    },
+    500
+  );
+
+}
+
+
+function login(){
+
+  const phone =
+    document
+      .getElementById("loginPhone")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("loginPassword")
+      .value;
+
+
+  const saved =
+    localStorage.getItem("jalwaUser");
+
+
+  if(!saved){
+
+    toast(
+      "No account found. Please register first."
+    );
+
+    return;
+
+  }
+
+
+  const user =
+    JSON.parse(saved);
+
+
+  if(
+    phone !== user.phone ||
+    password !== user.password
+  ){
+
+    toast(
+      "Invalid phone number or password."
+    );
+
+    return;
+
+  }
+
+
+  showApp();
+
+}
+
+
+/* =========================
+   SHOW APP
+========================= */
+
+function showApp(){
+
+  document
+    .getElementById("authView")
+    .classList.add("hidden");
+
+  document
+    .getElementById("appView")
+    .classList.remove("hidden");
+
+
+  /*
+    Process missed profits first.
+    This makes the calculation continue
+    even if the app was closed.
+  */
+
+  processAutomaticProfits();
+
+  loadUser();
+
+  renderMyPackages();
+
+  renderPlans();
+
+  populateApproval();
+
+  renderRequestHistory();
+
+}
+
+
+/* =========================
+   USER
+========================= */
+
+function loadUser(){
+
+  const saved =
+    localStorage.getItem("jalwaUser");
+
+
+  if(!saved){
+    return;
+  }
+
+
+  const user =
+    JSON.parse(saved);
+
+
+  const balance =
+    Number(
+      user.balance || 0
+    ).toLocaleString();
+
+
+  document
+    .getElementById("topBalance")
+    .textContent = balance;
+
+
+  document
+    .getElementById("balance")
+    .textContent = balance;
+
+
+  document
+    .getElementById("accountBalance")
+    .textContent = balance;
+
+
+  document
+    .getElementById("accountName")
+    .textContent =
+      user.name || "-";
+
+
+  document
+    .getElementById("accountPhone")
+    .textContent =
+      user.phone || "-";
+
+
+  document
+    .getElementById("accountReferral")
+    .textContent =
+      user.referral || "-";
+
+
+  const referralLink =
+    location.href.split("#")[0] +
+    "?ref=" +
+    encodeURIComponent(
+      user.referral || ""
+    );
+
+
+  document
+    .getElementById("refLink")
+    .textContent =
+      referralLink;
+
+}
+
+
+function logout(){
+
+  document
+    .getElementById("appView")
+    .classList.add("hidden");
+
+  document
+    .getElementById("authView")
+    .classList.remove("hidden");
+
+  showLogin();
+
+}
+
+
+/* =========================
+   PACKAGE STORAGE HELPERS
+========================= */
+
+function getPackageStart(number){
+
+  const raw =
+    localStorage.getItem(
+      "jalwa_plan_" + number
+    );
+
+
+  return raw
+    ? Number(raw)
+    : 0;
+
+}
+
+
+function getCreditedDays(number){
+
+  return Number(
+    localStorage.getItem(
+      "jalwa_profit_credited_" + number
+    ) || 0
+  );
+
+}
+
+
+function setCreditedDays(
+  number,
+  days
+){
+
+  localStorage.setItem(
+
+    "jalwa_profit_credited_" +
+    number,
+
+    String(days)
+
+  );
+
+}
+
+
+function getDailyProfit(amount){
+
+  return Math.floor(
+    Number(amount) / 4
+  );
+
+}
+
+
+/* =========================
+   AUTOMATIC PROFIT ENGINE
+========================= */
+
+function processAutomaticProfits(){
+
+  const saved =
+    localStorage.getItem("jalwaUser");
+
+
+  if(!saved){
+    return;
+  }
+
+
+  const user =
+    JSON.parse(saved);
+
+
+  let balance =
+    Number(user.balance || 0);
+
+
+  let changed = false;
+
+
+  const now =
+    Date.now();
+
+
+  const dayMs =
+    24 *
+    60 *
+    60 *
+    1000;
+
+
+  plans.forEach(
+    ([number,amount,days]) => {
+
+
+      const start =
+        getPackageStart(number);
+
+
+      if(!start){
+        return;
+      }
+
+
+      const elapsedPeriods =
+        Math.min(
+
+          days,
+
+          Math.max(
+
+            0,
+
+            Math.floor(
+              (now - start) /
+              dayMs
+            )
+
+          )
+
+        );
+
+
+      let credited =
+        Math.min(
+
+          getCreditedDays(number),
+
+          days
+
+        );
+
+
+      if(
+        elapsedPeriods >
+        credited
+      ){
+
+        const newPeriods =
+          elapsedPeriods -
+          credited;
+
+
+        const dailyProfit =
+          getDailyProfit(amount);
+
+
+        balance +=
+          dailyProfit *
+          newPeriods;
+
+
+        credited =
+          elapsedPeriods;
+
+
+        setCreditedDays(
+          number,
+          credited
+        );
+
+
+        changed = true;
+
+      }
+
+
+      if(
+        credited >
+        days
+      ){
+
+        setCreditedDays(
+          number,
+          days
+        );
+
+      }
+
+    }
+  );
+
+
+  if(changed){
+
+    user.balance =
+      balance;
+
+
+    localStorage.setItem(
+
+      "jalwaUser",
+
+      JSON.stringify(user)
+
+    );
+
+  }
+
+}
+
+
+/* =========================
+   DAILY COUNTDOWN
+========================= */
+
+function dailyCountdownText(
+  number,
+  days
+){
+
+  const start =
+    getPackageStart(number);
+
+
+  if(!start){
+
+    return "24:00:00";
+
+  }
+
+
+  const credited =
+    Math.min(
+
+      getCreditedDays(number),
+
+      days
+
+    );
+
+
+  if(
+    credited >= days
+  ){
+
+    return "COMPLETED";
+
+  }
+
+
+  const nextProfitAt =
+    start +
+    (credited + 1) *
+    24 *
+    60 *
+    60 *
+    1000;
+
+
+  let remaining =
+    nextProfitAt -
+    Date.now();
+
+
+  if(
+    remaining <= 0
+  ){
+
+    processAutomaticProfits();
+
+
+    const refreshed =
+      Math.min(
+
+        getCreditedDays(number),
+
+        days
+
+      );
+
+
+    if(
+      refreshed >= days
+    ){
+
+      return "COMPLETED";
+
+    }
+
+
+    remaining =
+      start +
+      (refreshed + 1) *
+      24 *
+      60 *
+      60 *
+      1000 -
+      Date.now();
+
+  }
+
+
+  const totalSeconds =
+    Math.max(
+
+      0,
+
+      Math.floor(
+        remaining / 1000
+      )
+
+    );
+
+
+  const h =
+    Math.floor(
+      totalSeconds / 3600
+    );
+
+
+  const m =
+    Math.floor(
+      (totalSeconds % 3600) /
+      60
+    );
+
+
+  const sec =
+    totalSeconds %
+    60;
+
+
+  return (
+
+    String(h)
+      .padStart(2,"0")
+
+    + ":"
+
+    +
+
+    String(m)
+      .padStart(2,"0")
+
+    + ":"
+
+    +
+
+    String(sec)
+      .padStart(2,"0")
+
+  );
+
+}
+
+
+/* =========================
+   MY PACKAGES
+========================= */
+
+function renderMyPackages(){
+
+  const container =
+    document.getElementById(
+      "myPackages"
+    );
+
+
+  if(!container){
+    return;
+  }
+
+
+  container.innerHTML = "";
+
+
+  let activeCount = 0;
+
+
+  plans.forEach(
+    ([number,amount,days]) => {
+
+
+      const start =
+        getPackageStart(number);
+
+
+      if(!start){
+        return;
+      }
+
+
+      const end =
+        start +
+        days *
+        24 *
+        60 *
+        60 *
+        1000;
+
+
+      if(
+        Date.now() >= end
+      ){
+
+        return;
+
+      }
+
+
+      activeCount++;
+
+
+      const daily =
+        getDailyProfit(amount);
+
+
+      const credited =
+        Math.min(
+
+          getCreditedDays(number),
+
+          days
+
+        );
+
+
+      const remainingDays =
+        Math.max(
+
+          0,
+
+          days - credited
+
+        );
+
+
+      const wrapper =
+        document.createElement(
+          "div"
+        );
+
+
+      wrapper.className =
+        "package-box";
+
+
+      wrapper.innerHTML = `
+
+        <div class="package-box-title">
+
+          JALWA-${String(number).padStart(2,"0")}
+          — PACKAGE
+
+        </div>
+
+
+        <div class="plan-amount">
+
+          Rs
+          ${amount.toLocaleString()}
+
+        </div>
+
+
+        <div class="plan-days">
+
+          Duration:
+          ${days}
+          Days
+
+        </div>
+
+
+        <div class="daily-profit">
+
+          DAILY PROFIT:
+          Rs
+          ${daily.toLocaleString()}
+
+        </div>
+
+
+        <div class="daily-profit">
+
+          TOTAL PROFIT:
+          Rs
+          ${(daily * days).toLocaleString()}
+
+        </div>
+
+
+        <div class="active-package-box">
+
+          <div class="active-title">
+
+            ACTIVE PACKAGE
+
+          </div>
+
+
+          <span class="active-badge">
+
+            ACTIVE
+
+          </span>
+
+
+          <div class="countdown-box">
+
+            <div class="countdown-label">
+
+              NEXT DAILY PROFIT IN
+
+            </div>
+
+
+            <div
+              id="package-countdown-${number}"
+              class="package-countdown"
+            >
+
+              ${dailyCountdownText(
+                number,
+                days
+              )}
+
+            </div>
+
+          </div>
+
+
+          <div class="profit-days">
+
+            PROFIT DAYS:
+            ${credited}
+            /
+            ${days}
+
+          </div>
+
+
+          <div class="profit-days">
+
+            REMAINING PROFIT DAYS:
+            ${remainingDays}
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      container.appendChild(
+        wrapper
+      );
+
+    }
+  );
+
+
+  if(
+    activeCount === 0
+  ){
+
+    container.innerHTML = `
+
+      <div
+        class="info-card"
+        style="
+          text-align:center;
+          color:#cdb184;
+        "
+      >
+
+        No active package yet.
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   UPDATE PACKAGE COUNTDOWNS
+========================= */
+
+function updatePackageCountdowns(){
+
+  processAutomaticProfits();
+
+
+  let needsRender = false;
+
+
+  plans.forEach(
+    ([number,amount,days]) => {
+
+
+      const start =
+        getPackageStart(number);
+
+
+      const countdown =
+        document.getElementById(
+          "package-countdown-" +
+          number
+        );
+
+
+      if(!start){
+        return;
+      }
+
+
+      const expired =
+        Date.now() >=
+        start +
+        days *
+        24 *
+        60 *
+        60 *
+        1000;
+
+
+      if(expired){
+
+        if(countdown){
+
+          countdown.textContent =
+            "COMPLETED";
+
+        }
+
+
+        needsRender = true;
+
+        return;
+
+      }
+
+
+      if(countdown){
+
+        countdown.textContent =
+          dailyCountdownText(
+            number,
+            days
+          );
+
+      }
+
+    }
+  );
+
+
+  if(needsRender){
+
+    renderMyPackages();
+
+    renderPlans();
+
+  }
+
+
+  loadUser();
+
+}
+
+
+/* =========================
+   PLANS
+========================= */
+
+function renderPlans(){
+
+  const container =
+    document.getElementById(
+      "plans"
+    );
+
+
+  if(!container){
+    return;
+  }
+
+
+  container.innerHTML = "";
+
+
+  plans.forEach(
+    ([number,amount,days]) => {
+
+
+      const savedStart =
+        localStorage.getItem(
+          "jalwa_plan_" +
+          number
+        );
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "plan-card";
+
+
+      const completed =
+        savedStart &&
+
+        Date.now() >=
+        Number(savedStart) +
+        days *
+        24 *
+        60 *
+        60 *
+        1000;
+
+
+      card.innerHTML = `
+
+        <div class="plan-name">
+
+          JALWA-${String(number).padStart(2,"0")}
+
+        </div>
+
+
+        <div class="plan-amount">
+
+          Rs
+          ${amount.toLocaleString()}
+
+        </div>
+
+
+        <div class="plan-days">
+
+          Duration:
+          ${days}
+          Days
+
+        </div>
+
+
+        <div class="daily-profit">
+
+          DAILY PROFIT:
+          Rs
+          ${Math.floor(
+            amount / 4
+          ).toLocaleString()}
+
+        </div>
+
+
+        <div
+          id="status-${number}"
+          class="status"
+        >
+
+          ${
+            completed
+
+            ? "Package period completed"
+
+            : savedStart
+
+              ? "Approved — " +
+                countdownText(
+                  savedStart,
+                  days
+                )
+
+              : "Waiting for Admin Approval"
+          }
+
+        </div>
+
+
+        <button
+          class="plan-btn"
+          onclick="
+            selectPlan(
+              ${number},
+              ${amount}
+            )
+          "
+        >
+
+          SELECT PLAN
+
+        </button>
+
+      `;
+
+
+      container.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================
+   APPROVAL
+========================= */
+
+function populateApproval(){
+
+  const select =
+    document.getElementById(
+      "approvalPlan"
+    );
+
+
+  if(!select){
+    return;
+  }
+
+
+  select.innerHTML =
+    `
+      <option value="">
+        Select Plan
+      </option>
+    `;
+
+
+  plans.forEach(
+    ([number,amount,days]) => {
+
+
+      const approved =
+        getPackageStart(
+          number
+        );
+
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        number;
+
+
+      option.textContent =
+
+        `JALWA-${String(number).padStart(2,"0")}` +
+
+        ` — Rs ${amount.toLocaleString()}` +
+
+        (
+
+          approved
+
+          ? " — APPROVED"
+
+          : ""
+
+        );
+
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
+
+function approveSelectedPlan(){
+
+  const number =
+    Number(
+      document
+        .getElementById(
+          "approvalPlan"
+        )
+        .value
+    );
+
+
+  if(!number){
+
+    toast(
+      "Please select a plan."
+    );
+
+    return;
+
+  }
+
+
+  const found =
+    plans.find(
+      p => p[0] === number
+    );
+
+
+  if(!found){
+    return;
+  }
+
+
+  const existingStart =
+    getPackageStart(
+      number
+    );
+
+
+  const durationMs =
+    found[2] *
+    24 *
+    60 *
+    60 *
+    1000;
+
+
+  if(
+    existingStart &&
+    Date.now() <
+      existingStart +
+      durationMs
+  ){
+
+    toast(
+
+      `JALWA-${String(number).padStart(2,"0")} is already active.`
+
+    );
+
+    return;
+
+  }
+
+
+  localStorage.setItem(
+
+    "jalwa_plan_" +
+    number,
+
+    Date.now().toString()
+
+  );
+
+
+  setCreditedDays(
+    number,
+    0
+  );
+
+
+  renderMyPackages();
+
+  renderPlans();
+
+  populateApproval();
+
+
+  toast(
+
+    `JALWA-${String(number).padStart(2,"0")} approved.`
+
+  );
+
+}
+
+
+/* =========================
+   PACKAGE COUNTDOWN TEXT
+========================= */
+
+function countdownText(
+  start,
+  days
+){
+
+  const remaining =
+
+    Number(start) +
+
+    days *
+    24 *
+    60 *
+    60 *
+    1000 -
+
+    Date.now();
+
+
+  if(
+    remaining <= 0
+  ){
+
+    return "Package period completed";
+
+  }
+
+
+  const totalSeconds =
+    Math.floor(
+      remaining / 1000
+    );
+
+
+  const d =
+    Math.floor(
+      totalSeconds / 86400
+    );
+
+
+  const h =
+    Math.floor(
+      (totalSeconds % 86400) /
+      3600
+    );
+
+
+  const m =
+    Math.floor(
+      (totalSeconds % 3600) /
+      60
+    );
+
+
+  const sec =
+    totalSeconds %
+    60;
+
+
+  return (
+
+    `${d}d ` +
+    `${h}h ` +
+    `${m}m ` +
+    `${sec}s remaining`
+
+  );
+
+}
+
+
+/* =========================
+   PLAN STATUS TIMER
+========================= */
+
+function updateTimers(){
+
+  plans.forEach(
+    ([number,amount,days]) => {
+
+
+      const start =
+        getPackageStart(
+          number
+        );
+
+
+      const status =
+        document.getElementById(
+          "status-" +
+          number
+        );
+
+
+      if(!status){
+        return;
+      }
+
+
+      if(!start){
+
+        status.textContent =
+          "Waiting for Admin Approval";
+
+        return;
+
+      }
+
+
+      status.textContent =
+        "Approved — " +
+        countdownText(
+          start,
+          days
+        );
+
+    }
+  );
+
+}
+
+
+/* =========================
+   REQUESTS
+========================= */
+
+function openRequest(
+  type
+){
+
+  requestType =
+    type;
+
+
+  const modal =
+    document.getElementById(
+      "requestModal"
+    );
+
+
+  const deposit =
+    document.getElementById(
+      "depositFields"
+    );
+
+
+  const withdraw =
+    document.getElementById(
+      "withdrawFields"
+    );
+
+
+  modal.classList.remove(
+    "hidden"
+  );
+
+
+  if(
+    type === "deposit"
+  ){
+
+    document
+      .getElementById(
+        "requestTitle"
+      )
+      .textContent =
+        "Deposit Request";
+
+
+    deposit
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    withdraw
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    if(
+      selectedPlanNumber
+    ){
+
+      const found =
+        plans.find(
+          p =>
+            p[0] ===
+            selectedPlanNumber
+        );
+
+
+      document
+        .getElementById(
+          "reqAmount"
+        )
+        .value =
+          found
+            ? found[1]
+            : "";
+
+    }
+
+
+    document
+      .getElementById(
+        "reqRef"
+      )
+      .value =
+        "";
+
+
+    document
+      .getElementById(
+        "reqShot"
+      )
+      .value =
+        "";
+
+  }else{
+
+    document
+      .getElementById(
+        "requestTitle"
+      )
+      .textContent =
+        "Withdrawal Request";
+
+
+    deposit
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    withdraw
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "wdMethod"
+      )
+      .value =
+        "";
+
+
+    document
+      .getElementById(
+        "wdAmount"
+      )
+      .value =
+        "";
+
+
+    document
+      .getElementById(
+        "wdAccount"
+      )
+      .value =
+        "";
+
+
+    document
+      .getElementById(
+        "wdName"
+      )
+      .value =
+        "";
+
+  }
+
+}
+
+
+/* =========================
+   BANK LIST
+========================= */
+
+function toggleBankList(){
+
+  /*
+    Withdrawal Bank / Wallet
+    selection is handled directly
+    by the select menu.
+  */
+
+}
+
+
+/* =========================
+   SUBMIT REQUEST
+========================= */
+
+function submitRequest(){
+
+  const requests =
+    JSON.parse(
+
+      localStorage.getItem(
+        "jalwaRequests"
+      ) || "[]"
+
+    );
+
+
+  if(
+    requestType ===
+    "deposit"
+  ){
+
+    const amount =
+      Number(
+        document
+          .getElementById(
+            "reqAmount"
+          )
+          .value
+      );
+
+
+    const ref =
+      document
+        .getElementById(
+          "reqRef"
+        )
+        .value
+        .trim();
+
+
+    const shot =
+      document
+        .getElementById(
+          "reqShot"
+        )
+        .files[0];
+
+
+    if(
+      !amount ||
+      amount <= 0
+    ){
+
+      toast(
+        "Please enter a valid deposit amount."
+      );
+
+      return;
+
+    }
+
+
+    requests.push({
+
+      type:
+        "Deposit",
+
+      planNumber:
+        selectedPlanNumber,
+
+      method:
+        "Easypaisa",
+
+      destination:
+        "03221619080",
+
+      accountName:
+        "Akhtari Bibi",
+
+      amount:
+        amount,
+
+      reference:
+        ref,
+
+      screenshotName:
+        shot
+          ? shot.name
+          : "",
+
+      status:
+        "PENDING",
+
+      date:
+        new Date()
+          .toLocaleString()
+
+    });
+
+
+    localStorage.setItem(
+
+      "jalwaRequests",
+
+      JSON.stringify(
+        requests
+      )
+
+    );
+
+
+    closeModals();
+
+
+    renderRequestHistory();
+
+
+    toast(
+      "Deposit request submitted — PENDING."
+    );
+
+
+  }else{
+
+
+    const amount =
+      Number(
+        document
+          .getElementById(
+            "wdAmount"
+          )
+          .value
+      );
+
+
+    const method =
+      document
+        .getElementById(
+          "wdMethod"
+        )
+        .value
+        .trim();
+
+
+    const account =
+      document
+        .getElementById(
+          "wdAccount"
+        )
+        .value
+        .trim();
+
+
+    const name =
+      document
+        .getElementById(
+          "wdName"
+        )
+        .value
+        .trim();
+
+
+    if(!method){
+
+      toast(
+        "Please select a bank or wallet."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      !amount ||
+      amount < 65
+    ){
+
+      toast(
+        "Minimum withdrawal is Rs 65."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      !account ||
+      !name
+    ){
+
+      toast(
+        "Please enter account number and name."
+      );
+
+      return;
+
+    }
+
+
+    requests.push({
+
+      type:
+        "Withdrawal",
+
+      method:
+        method,
+
+      amount:
+        amount,
+
+      account:
+        account,
+
+      accountName:
+        name,
+
+      status:
+        "PENDING",
+
+      date:
+        new Date()
+          .toLocaleString()
+
+    });
+
+
+    localStorage.setItem(
+
+      "jalwaRequests",
+
+      JSON.stringify(
+        requests
+      )
+
+    );
+
+
+    closeModals();
+
+
+    renderRequestHistory();
+
+
+    toast(
+      "Withdrawal request submitted — PENDING."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   SELECT PLAN
+========================= */
+
+function selectPlan(
+  number,
+  amount
+){
+
+  selectedPlanNumber =
+    number;
+
+
+  openRequest(
+    "deposit"
+  );
+
+
+  document
+    .getElementById(
+      "reqAmount"
+    )
+    .value =
+      amount;
+
+}
+
+
+/* =========================
+   MENU
+========================= */
+
+function openMenu(){
+
+  document
+    .getElementById(
+      "sideMenu"
+    )
+    .classList
+    .add(
+      "open"
+    );
+
+
+  document
+    .getElementById(
+      "overlay"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+}
+
+
+function closeMenu(){
+
+  document
+    .getElementById(
+      "sideMenu"
+    )
+    .classList
+    .remove(
+      "open"
+    );
+
+
+  document
+    .getElementById(
+      "overlay"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+}
+
+
+/* =========================
+   ACCOUNT
+========================= */
+
+function showAccount(){
+
+  closeMenu();
+
+
+  document
+    .getElementById(
+      "homeSection"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "plansSection"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "myPackagesSection"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "accountSection"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  loadUser();
+
+
+  renderRequestHistory();
+
+}
+
+
+function showHome(){
+
+  document
+    .getElementById(
+      "accountSection"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "homeSection"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "plansSection"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "myPackagesSection"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  renderMyPackages();
+
+}
+
+
+function scrollToSection(
+  id
+){
+
+  closeMenu();
+
+
+  showHome();
+
+
+  setTimeout(
+    () => {
+
+      const el =
+        document.getElementById(
+          id
+        );
+
+
+      if(el){
+
+        el.scrollIntoView({
+          behavior:"smooth"
+        });
+
+      }
+
+    },
+    100
+  );
+
+}
+
+
+/* =========================
+   REFERRAL
+========================= */
+
+function copyRef(){
+
+  const text =
+    document
+      .getElementById(
+        "refLink"
+      )
+      .textContent;
+
+
+  if(
+    navigator.clipboard
+  ){
+
+    navigator.clipboard
+      .writeText(
+        text
+      )
+      .then(
+        () => {
+
+          toast(
+            "Referral link copied."
+          );
+
+        }
+      )
+      .catch(
+        () => {
+
+          toast(
+            "Copy not supported in this browser."
+          );
+
+        }
+      );
+
+  }else{
+
+    toast(
+      "Copy not supported in this browser."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   REQUEST HISTORY
+========================= */
+
+function renderRequestHistory(){
+
+  const box =
+    document.getElementById(
+      "requestHistory"
+    );
+
+
+  if(!box){
+    return;
+  }
+
+
+  const requests =
+    JSON.parse(
+
+      localStorage.getItem(
+        "jalwaRequests"
+      ) || "[]"
+
+    );
+
+
+  if(
+    !requests.length
+  ){
+
+    box.innerHTML = `
+
+      <div
+        class="info-card"
+        style="
+          text-align:center;
+          color:#cdb184;
+        "
+      >
+
+        No requests yet.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML = "";
+
+
+  requests
+    .slice()
+    .reverse()
+    .forEach(
+      r => {
+
+
+        const item =
+          document.createElement(
+            "div"
+          );
+
+
+        item.className =
+          "request-item";
+
+
+        item.innerHTML = `
+
+          <b>
+            ${r.type}
+          </b>
+
+          —
+          Rs
+          ${Number(
+            r.amount || 0
+          ).toLocaleString()}
+
+          <br>
+
+          Status:
+          <span
+            style="color:#ffd54a"
+          >
+            ${r.status}
+          </span>
+
+          <br>
+
+          Method:
+          ${r.method || "-"}
+
+          <br>
+
+          ${
+            r.type === "Deposit" &&
+            r.screenshotName
+
+              ? "Screenshot: " +
+                r.screenshotName +
+                "<br>"
+
+              : ""
+          }
+
+          ${
+            r.type === "Withdrawal"
+
+              ? "Account: " +
+                (r.account || "-") +
+                "<br>"
+
+              : ""
+          }
+
+          Date:
+          ${r.date || "-"}
+
+        `;
+
+
+        box.appendChild(
+          item
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================
+   REQUEST HISTORY OPEN
+========================= */
+
+function openHistory(){
+
+  closeMenu();
+
+
+  showAccount();
+
+
+  toast(
+    "Request status opened."
+  );
+
+}
+
+
+/* =========================
+   CONTACT ADMIN
+========================= */
+
+function contactAdmin(){
+
+  const adminNumber =
+    "+92 336 1619022";
+
+  const whatsappLink =
+    "https://wa.me/923361619022";
+
+
+  const message =
+    "JALWA ADMIN CONTACT\n\n" +
+    "WhatsApp Number:\n" +
+    adminNumber +
+    "\n\n" +
+    "WhatsApp Link:\n" +
+    whatsappLink;
+
+
+  if(
+    confirm(
+      message +
+      "\n\nOpen WhatsApp?"
+    )
+  ){
+
+    window.open(
+      whatsappLink,
+      "_blank"
+    );
+
+  }
+
+}
+
+
+/* =========================
+   CHANNEL
+========================= */
+
+function joinChannel(){
+
+  const channelLink =
+    "https://whatsapp.com/channel/0029Vb9D4v4LNSZw8KT6Tk2P";
+
+
+  const message =
+    "JALWA OFFICIAL WHATSAPP CHANNEL\n\n" +
+    "Channel Link:\n" +
+    channelLink;
+
+
+  if(
+    confirm(
+      message +
+      "\n\nOpen Channel?"
+    )
+  ){
+
+    window.open(
+      channelLink,
+      "_blank"
+    );
+
+  }
+
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+function closeModals(){
+
+  document
+    .getElementById(
+      "requestModal"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer;
+
+
+function toast(
+  message
+){
+
+  const box =
+    document.getElementById(
+      "toast"
+    );
+
+
+  box.textContent =
+    message;
+
+
+  box.style.display =
+    "block";
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+  toastTimer =
+    setTimeout(
+      () => {
+
+        box.style.display =
+          "none";
+
+      },
+      3000
+    );
+
+}
+
+
+/* =========================
+   APP START
+========================= */
+
+window.addEventListener(
+  "load",
+  () => {
+
+
+    const saved =
+      localStorage.getItem(
+        "jalwaUser"
+      );
+
+
+    if(saved){
+
+      showApp();
+
+    }else{
+
+      document
+        .getElementById(
+          "authView"
+        )
+        .classList
+        .remove(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "appView"
+        )
+        .classList
+        .add(
+          "hidden"
+        );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   ONE UNIFIED TIMER
+========================= */
+
+setInterval(
+  () => {
+
+    processAutomaticProfits();
+
+    updateTimers();
+
+    updatePackageCountdowns();
+
+  },
+  1000
+);
+
+
+/* =========================
+   SERVICE WORKER
+========================= */
+
+if(
+  "serviceWorker" in navigator
+){
+
+  window.addEventListener(
+    "load",
+    () => {
+
+      navigator.serviceWorker
+        .register(
+          "./service-worker.js"
+        )
+
+        .then(
+          () => {
+
+            console.log(
+              "JALWA service worker registered."
+            );
+
+          }
+        )
+
+        .catch(
+          error => {
+
+            console.error(
+              "Service worker registration failed:",
+              error
+            );
+
+          }
+        );
+
+    }
+  );
+
+}
+
+
+/* =========================
+   PWA INSTALL
+========================= */
+
+let deferredPrompt = null;
+
+
+window.addEventListener(
+  "beforeinstallprompt",
+  e => {
+
+    e.preventDefault();
+
+    deferredPrompt =
+      e;
+
+  }
+);
+
+
+function installApp(){
+
+  if(
+    !deferredPrompt
+  ){
+
+    toast(
+      "Install popup is not available yet. Open JALWA in Chrome using localhost and try again."
+    );
+
+    return;
+
+  }
+
+
+  deferredPrompt.prompt();
+
+
+  deferredPrompt.userChoice
+    .then(
+      choice => {
+
+
+        if(
+          choice.outcome ===
+          "accepted"
+        ){
+
+          toast(
+            "JALWA installation started."
+          );
+
+        }else{
+
+          toast(
+            "Installation cancelled."
+          );
+
+        }
+
+
+        deferredPrompt =
+          null;
+
+      }
+    );
+
+}
+
+
+window.addEventListener(
+  "appinstalled",
+  () => {
+
+    toast(
+      "JALWA installed successfully."
+    );
+
+  }
+);
+
+</script>
+
+</body>
+</html>
