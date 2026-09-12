@@ -25,19 +25,23 @@ const server = http.createServer((req, res) => {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      res.writeHead(404, {"Content-Type": "text/plain"});
+      res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("404 - File Not Found");
       return;
     }
 
     const ext = path.extname(filePath).toLowerCase();
+
     res.writeHead(200, {
       "Content-Type": mime[ext] || "application/octet-stream"
     });
+
     res.end(data);
   });
 });
 
-server.listen(3000, () => {
-  console.log("JALWA Server running at http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`JALWA Server running on port ${PORT}`);
 });
