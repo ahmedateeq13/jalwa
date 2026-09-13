@@ -4442,31 +4442,14 @@ window.addEventListener(
 
 function installApp(){
 
-  if(
-    !deferredPrompt
-  ){
+  if(deferredPrompt){
 
-    toast(
-      "Install popup is not available yet. Open JALWA in Chrome using localhost and try again."
-    );
+    deferredPrompt.prompt();
 
-    return;
-
-  }
-
-
-  deferredPrompt.prompt();
-
-
-  deferredPrompt.userChoice
-    .then(
+    deferredPrompt.userChoice.then(
       choice => {
 
-
-        if(
-          choice.outcome ===
-          "accepted"
-        ){
+        if(choice.outcome === "accepted"){
 
           toast(
             "JALWA installation started."
@@ -4480,15 +4463,23 @@ function installApp(){
 
         }
 
-
-        deferredPrompt =
-          null;
+        deferredPrompt = null;
 
       }
     );
 
-}
+    return;
+  }
 
+  /* =========================
+     FALLBACK FOR CHROME
+  ========================= */
+
+  toast(
+    "Chrome menu se Install JALWA select karein."
+  );
+
+}
 
 window.addEventListener(
   "appinstalled",
