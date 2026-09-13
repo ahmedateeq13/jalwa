@@ -1891,7 +1891,20 @@ async function register(){
       error
     );
 
-    async function login(){
+    toast(
+      "Something went wrong. Please try again."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login(){
 
   const phone =
     document
