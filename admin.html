@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JALWA Admin Panel</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#090504;
+  color:#fff;
+}
+
+button,input,select{
+  font-family:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* LOGIN */
+.login{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:radial-gradient(circle at top,#4c1e0c,#090504 65%);
+}
+
+.login-box{
+  width:100%;
+  max-width:390px;
+  padding:28px;
+  border-radius:22px;
+  background:#170a06;
+  border:1px solid #b77822;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+
+.logo{
+  text-align:center;
+  color:#ffd56a;
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:6px;
+  margin-bottom:5px;
+}
+
+.sub{
+  text-align:center;
+  color:#cdb184;
+  font-size:12px;
+  margin-bottom:25px;
+}
+
+.login-box h2{
+  color:#ffd56a;
+  margin-bottom:15px;
+}
+
+.input{
+  width:100%;
+  padding:13px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:1px solid #684017;
+  background:#090504;
+  color:#fff;
+  outline:none;
+}
+
+.input:focus{
+  border-color:#d39b3b;
+}
+
+.gold-btn{
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:10px;
+  background:linear-gradient(135deg,#d79a31,#8c4e0c);
+  color:#fff;
+  font-weight:bold;
+}
+
+/* ADMIN */
+.admin{
+  min-height:100vh;
+  display:flex;
+  background:#090504;
+}
+
+.sidebar{
+  width:250px;
+  min-height:100vh;
+  background:#130805;
+  border-right:1px solid #684017;
+  padding:22px 15px;
+  position:fixed;
+  left:0;
+  top:0;
+}
+
+.sidebar-logo{
+  color:#ffd56a;
+  font-size:27px;
+  font-weight:900;
+  letter-spacing:4px;
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.menu-btn{
+  width:100%;
+  padding:13px;
+  margin-bottom:8px;
+  border:1px solid rgba(255,190,80,.15);
+  border-radius:10px;
+  background:#211006;
+  color:#eac77f;
+  text-align:left;
+}
+
+.menu-btn:hover,
+.menu-btn.active{
+  background:#6b2d0c;
+  color:#ffd56a;
+  border-color:#b77822;
+}
+
+.logout{
+  margin-top:20px;
+}
+
+.main{
+  width:100%;
+  margin-left:250px;
+  padding:25px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+}
+
+.topbar h1{
+  color:#ffd56a;
+  font-size:25px;
+}
+
+.admin-name{
+  color:#cdb184;
+  font-size:13px;
+}
+
+/* CARDS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.stat{
+  padding:20px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#2a1007,#130805);
+  border:1px solid rgba(255,190,80,.25);
+}
+
+.stat-title{
+  color:#bfa77f;
+  font-size:12px;
+}
+
+.stat-number{
+  color:#ffd56a;
+  font-size:27px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+/* SECTIONS */
+.panel{
+  background:#170a06;
+  border:1px solid rgba(255,190,80,.22);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:20px;
+}
+
+.panel h2{
+  color:#ffd56a;
+  font-size:18px;
+  margin-bottom:15px;
+}
+
+/* TABLE */
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+th,td{
+  padding:12px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  text-align:left;
+  font-size:12px;
+}
+
+th{
+  color:#ffd56a;
+  background:#211006;
+}
+
+td{
+  color:#e5c997;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:bold;
+}
+
+.pending{
+  background:#5c3b0c;
+  color:#ffd56a;
+}
+
+.approved{
+  background:#174b28;
+  color:#8df0aa;
+}
+
+.rejected{
+  background:#571d1d;
+  color:#ff9999;
+}
+
+.action{
+  padding:7px 9px;
+  border:0;
+  border-radius:7px;
+  margin:2px;
+  font-size:10px;
+  font-weight:bold;
+}
+
+.approve{
+  background:#286b3a;
+  color:#fff;
+}
+
+.reject{
+  background:#7a2929;
+  color:#fff;
+}
+
+.block{
+  background:#684017;
+  color:#fff;
+}
+
+/* EMPTY */
+.empty{
+  padding:25px;
+  text-align:center;
+  color:#9f896b;
+  font-size:13px;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+
+  .sidebar{
+    width:210px;
+  }
+
+  .main{
+    margin-left:210px;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:650px){
+
+  .sidebar{
+    position:relative;
+    width:100%;
+    min-height:auto;
+  }
+
+  .admin{
+    display:block;
+  }
+
+  .main{
+    margin-left:0;
+    padding:15px;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .topbar{
+    display:block;
+  }
+
+  .admin-name{
+    margin-top:7px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- ADMIN LOGIN -->
+<div id="loginView" class="login">
+
+  <div class="login-box">
+
+    <div class="logo">JALWA</div>
+
+    <div class="sub">
+      ADMIN CONTROL PANEL
+    </div>
+
+    <h2>Admin Login</h2>
+
+    <input
+      id="adminUser"
+      class="input"
+      type="text"
+      placeholder="Admin Username"
+    >
+
+    <input
+      id="adminPass"
+      class="input"
+      type="password"
+      placeholder="Admin Password"
+    >
+
+    <button
+      class="gold-btn"
+      onclick="adminLogin()"
+    >
+      LOGIN
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ADMIN PANEL -->
+<div id="adminView" class="admin hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-logo">
+      JALWA
+    </div>
+
+    <button
+      class="menu-btn active"
+      onclick="showSection('dashboard',this)"
+    >
+      📊 Dashboard
+    </button>
+
+    <button
+      class="menu-btn"
+      onclick="showSection('users',this)"
+    >
+      👥 Users
+    </button>
+
+    <button
+      class="menu-btn"
+      onclick="showSection('deposits',this)"
+    >
+      💰 Deposits
+    </button>
+
+    <button
+      class="menu-btn"
+      onclick="showSection('withdrawals',this)"
+    >
+      💸 Withdrawals
+    </button>
+
+    <button
+      class="menu-btn"
+      onclick="showSection('transactions',this)"
+    >
+      💳 Transactions
+    </button>
+
+    <button
+      class="menu-btn"
+      onclick="showSection('notifications',this)"
+    >
+      🔔 Notifications
+    </button>
+
+    <button
+      class="menu-btn"
+      onclick="showSection('settings',this)"
+    >
+      ⚙️ Settings
+    </button>
+
+    <button
+      class="menu-btn logout"
+      onclick="adminLogout()"
+    >
+      🚪 Logout
+    </button>
+
+  </aside>
+
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+
+      <h1 id="pageTitle">
+        Dashboard
+      </h1>
+
+      <div class="admin-name">
+        Logged in as: Admin
+      </div>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section">
+
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-title">Total Users</div>
+          <div id="totalUsers" class="stat-number">0</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Pending Deposits</div>
+          <div id="pendingDeposits" class="stat-number">0</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Pending Withdrawals</div>
+          <div id="pendingWithdrawals" class="stat-number">0</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Transactions</div>
+          <div id="totalTransactions" class="stat-number">0</div>
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <h2>Recent Requests</h2>
+
+        <div id="recentRequests"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- USERS -->
+    <section id="users" class="section hidden">
+
+      <div class="panel">
+
+        <h2>Users Management</h2>
+
+        <div id="usersContent"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- DEPOSITS -->
+    <section id="deposits" class="section hidden">
+
+      <div class="panel">
+
+        <h2>Deposit Requests</h2>
+
+        <div id="depositsContent"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- WITHDRAWALS -->
+    <section id="withdrawals" class="section hidden">
+
+      <div class="panel">
+
+        <h2>Withdrawal Requests</h2>
+
+        <div id="withdrawalsContent"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- TRANSACTIONS -->
+    <section id="transactions" class="section hidden">
+
+      <div class="panel">
+
+        <h2>Complete Transactions</h2>
+
+        <div id="transactionsContent"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- NOTIFICATIONS -->
+    <section id="notifications" class="section hidden">
+
+      <div class="panel">
+
+        <h2>Notifications</h2>
+
+        <input
+          id="notificationText"
+          class="input"
+          placeholder="Write notification"
+        >
+
+        <button
+          class="gold-btn"
+          onclick="sendNotification()"
+        >
+          SEND NOTIFICATION
+        </button>
+
+        <div
+          id="notificationList"
+          style="margin-top:20px;"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+    <section id="settings" class="section hidden">
+
+      <div class="panel">
+
+        <h2>Settings</h2>
+
+        <label style="display:block;color:#cdb184;font-size:12px;margin-bottom:7px;">
+          Payment Method
+        </label>
+
+        <select id="paymentMethod" class="input">
+          <option>All Banks</option>
+        </select>
+
+        <label style="display:block;color:#cdb184;font-size:12px;margin-bottom:7px;">
+          Payment Account Number
+        </label>
+
+        <input
+          id="paymentNumber"
+          class="input"
+          value="03221619080"
+        >
+
+        <label style="display:block;color:#cdb184;font-size:12px;margin-bottom:7px;">
+          Account Holder Name
+        </label>
+
+        <input
+          id="paymentName"
+          class="input"
+          value="Akhtari Bibi"
+        >
+
+        <button
+          class="gold-btn"
+          onclick="saveSettings()"
+        >
+          SAVE SETTINGS
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+function adminLogin(){
+
+  const username =
+    document.getElementById("adminUser").value.trim();
+
+  const password =
+    document.getElementById("adminPass").value;
+
+  /*
+    FIRST DEMO LOGIN
+
+    Username: admin
+    Password: admin123
+  */
+
+  if(
+    username === "admin" &&
+    password === "admin123"
+  ){
+
+    localStorage.setItem(
+      "jalwaAdminLogin",
+      "true"
+    );
+
+    showAdmin();
+
+  }else{
+
+    alert("Invalid admin username or password.");
+
+  }
+
+}
+
+
+function showAdmin(){
+
+  document
+    .getElementById("loginView")
+    .classList.add("hidden");
+
+  document
+    .getElementById("adminView")
+    .classList.remove("hidden");
+
+  loadDashboard();
+
+}
+
+
+function adminLogout(){
+
+  localStorage.removeItem(
+    "jalwaAdminLogin"
+  );
+
+  document
+    .getElementById("adminView")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginView")
+    .classList.remove("hidden");
+
+}
+
+
+/* =========================
+   SECTIONS
+========================= */
+
+function showSection(id,button){
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section => {
+      section.classList.add("hidden");
+    });
+
+  document
+    .getElementById(id)
+    .classList.remove("hidden");
+
+
+  document
+    .querySelectorAll(".menu-btn")
+    .forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+  button.classList.add("active");
+
+
+  const titles = {
+    dashboard:"Dashboard",
+    users:"Users",
+    deposits:"Deposits",
+    withdrawals:"Withdrawals",
+    transactions:"Transactions",
+    notifications:"Notifications",
+    settings:"Settings"
+  };
+
+  document.getElementById("pageTitle")
+    .textContent = titles[id];
+
+
+  if(id === "dashboard")
+    loadDashboard();
+
+  if(id === "users")
+    loadUsers();
+
+  if(id === "deposits")
+    loadDeposits();
+
+  if(id === "withdrawals")
+    loadWithdrawals();
+
+  if(id === "transactions")
+    loadTransactions();
+
+  if(id === "notifications")
+    loadNotifications();
+
+}
+
+
+/* =========================
+   REQUEST DATA
+========================= */
+
+function getRequests(){
+
+  return JSON.parse(
+    localStorage.getItem("jalwaRequests") || "[]"
+  );
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function loadDashboard(){
+
+  const requests = getRequests();
+
+  const deposits =
+    requests.filter(r =>
+      r.type === "Deposit" &&
+      r.status === "PENDING"
+    );
+
+  const withdrawals =
+    requests.filter(r =>
+      r.type === "Withdrawal" &&
+      r.status === "PENDING"
+    );
+
+
+  document.getElementById("totalUsers")
+    .textContent =
+      localStorage.getItem("jalwaUser") ? "1" : "0";
+
+  document.getElementById("pendingDeposits")
+    .textContent = deposits.length;
+
+  document.getElementById("pendingWithdrawals")
+    .textContent = withdrawals.length;
+
+  document.getElementById("totalTransactions")
+    .textContent = requests.length;
+
+
+  const recent =
+    requests.slice(-5).reverse();
+
+  const box =
+    document.getElementById("recentRequests");
+
+
+  if(!recent.length){
+
+    box.innerHTML =
+      `<div class="empty">No requests yet.</div>`;
+
+    return;
+  }
+
+
+  box.innerHTML = `
+    <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+
+      ${recent.map(r => `
+
+        <tr>
+
+          <td>${r.type}</td>
+
+          <td>Rs ${Number(r.amount || 0).toLocaleString()}</td>
+
+          <td>
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
+            </span>
+          </td>
+
+          <td>${r.date || "-"}</td>
+
+        </tr>
+
+      `).join("")}
+
+    </table>
+    </div>
+  `;
+
+}
+
+
+/* =========================
+   USERS
+========================= */
+
+function loadUsers(){
+
+  const saved =
+    localStorage.getItem("jalwaUser");
+
+  const box =
+    document.getElementById("usersContent");
+
+
+  if(!saved){
+
+    box.innerHTML =
+      `<div class="empty">No users found.</div>`;
+
+    return;
+  }
+
+
+  const user =
+    JSON.parse(saved);
+
+
+  box.innerHTML = `
+
+    <div class="table-wrap">
+
+    <table>
+
+      <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Balance</th>
+        <th>Referral</th>
+        <th>Action</th>
+      </tr>
+
+      <tr>
+
+        <td>${user.name || "-"}</td>
+
+        <td>${user.phone || "-"}</td>
+
+        <td>
+          Rs ${Number(user.balance || 0).toLocaleString()}
+        </td>
+
+        <td>${user.referral || "-"}</td>
+
+        <td>
+          <button
+            class="action block"
+            onclick="adjustBalance()"
+          >
+            Balance
+          </button>
+        </td>
+
+      </tr>
+
+    </table>
+
+    </div>
+  `;
+
+}
+
+
+function adjustBalance(){
+
+  const amount =
+    prompt("Enter new balance:");
+
+  if(amount === null)
+    return;
+
+  const value =
+    Number(amount);
+
+  if(isNaN(value) || value < 0){
+
+    alert("Invalid balance.");
+
+    return;
+  }
+
+
+  const saved =
+    localStorage.getItem("jalwaUser");
+
+  if(!saved) return;
+
+
+  const user =
+    JSON.parse(saved);
+
+  user.balance = value;
+
+
+  localStorage.setItem(
+    "jalwaUser",
+    JSON.stringify(user)
+  );
+
+
+  loadUsers();
+
+  loadDashboard();
+
+  alert("Balance updated.");
+
+}
+
+
+/* =========================
+   DEPOSITS
+========================= */
+
+function loadDeposits(){
+
+  const requests = getRequests();
+
+  const deposits =
+    requests.filter(r =>
+      r.type === "Deposit"
+    );
+
+  const box =
+    document.getElementById("depositsContent");
+
+
+  if(!deposits.length){
+
+    box.innerHTML =
+      `<div class="empty">No deposit requests.</div>`;
+
+    return;
+  }
+
+
+  box.innerHTML = `
+
+    <div class="table-wrap">
+
+    <table>
+
+      <tr>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Reference</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+
+      ${deposits.map((r,index) => {
+
+        const realIndex =
+          requests.indexOf(r);
+
+        return `
+
+        <tr>
+
+          <td>
+            Rs ${Number(r.amount || 0).toLocaleString()}
+          </td>
+
+          <td>${r.method || "-"}</td>
+
+          <td>${r.reference || "-"}</td>
+
+          <td>
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
+            </span>
+          </td>
+
+          <td>${r.date || "-"}</td>
+
+          <td>
+
+            ${
+              r.status === "PENDING"
+              ? `
+                <button
+                  class="action approve"
+                  onclick="approveRequest(${realIndex})"
+                >
+                  APPROVE
+                </button>
+
+                <button
+                  class="action reject"
+                  onclick="rejectRequest(${realIndex})"
+                >
+                  REJECT
+                </button>
+              `
+              : "-"
+            }
+
+          </td>
+
+        </tr>
+
+        `;
+
+      }).join("")}
+
+    </table>
+
+    </div>
+  `;
+
+}
+
+
+/* =========================
+   WITHDRAWALS
+========================= */
+
+function loadWithdrawals(){
+
+  const requests = getRequests();
+
+  const withdrawals =
+    requests.filter(r =>
+      r.type === "Withdrawal"
+    );
+
+  const box =
+    document.getElementById("withdrawalsContent");
+
+
+  if(!withdrawals.length){
+
+    box.innerHTML =
+      `<div class="empty">No withdrawal requests.</div>`;
+
+    return;
+  }
+
+
+  box.innerHTML = `
+
+    <div class="table-wrap">
+
+    <table>
+
+      <tr>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Bank</th>
+        <th>Number</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+
+      ${withdrawals.map(r => {
+
+        const realIndex =
+          requests.indexOf(r);
+
+        return `
+
+        <tr>
+
+          <td>
+            Rs ${Number(r.amount || 0).toLocaleString()}
+          </td>
+
+          <td>${r.method || "-"}</td>
+
+          <td>${r.bank || "-"}</td>
+
+          <td>${r.account || "-"}</td>
+
+          <td>${r.accountName || "-"}</td>
+
+          <td>
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
+            </span>
+          </td>
+
+          <td>
+
+            ${
+              r.status === "PENDING"
+              ? `
+                <button
+                  class="action approve"
+                  onclick="approveRequest(${realIndex})"
+                >
+                  APPROVE
+                </button>
+
+                <button
+                  class="action reject"
+                  onclick="rejectRequest(${realIndex})"
+                >
+                  REJECT
+                </button>
+              `
+              : "-"
+            }
+
+          </td>
+
+        </tr>
+
+        `;
+
+      }).join("")}
+
+    </table>
+
+    </div>
+  `;
+
+}
+
+
+/* =========================
+   APPROVE
+========================= */
+
+function approveRequest(index){
+
+  const requests =
+    getRequests();
+
+  const request =
+    requests[index];
+
+
+  if(!request)
+    return;
+
+
+  request.status =
+    "APPROVED";
+
+
+  /*
+    DEMO BALANCE UPDATE
+
+    Deposit approved:
+    amount is added to user balance.
+
+    Withdrawal approved:
+    amount is deducted.
+  */
+
+  const saved =
+    localStorage.getItem("jalwaUser");
+
+
+  if(saved){
+
+    const user =
+      JSON.parse(saved);
+
+    const amount =
+      Number(request.amount || 0);
+
+
+    if(request.type === "Deposit"){
+
+      user.balance =
+      Number(user.balance || 0) + (amount * 0.25);
+
+    }
+if(request.type === "Deposit" && request.planNumber){
+
+  localStorage.setItem(
+    "jalwa_plan_" + request.planNumber,
+    Date.now().toString()
+  );
+
+}
+
+    if(request.type === "Withdrawal"){
+
+      user.balance =
+        Math.max(
+          0,
+          Number(user.balance || 0) - amount
+        );
+
+    }
+
+
+    localStorage.setItem(
+      "jalwaUser",
+      JSON.stringify(user)
+    );
+
+  }
+
+
+  localStorage.setItem(
+    "jalwaRequests",
+    JSON.stringify(requests)
+  );
+
+
+  loadDashboard();
+  loadDeposits();
+  loadWithdrawals();
+  loadTransactions();
+
+  alert("Request approved.");
+
+}
+
+
+/* =========================
+   REJECT
+========================= */
+
+function rejectRequest(index){
+
+  const requests =
+    getRequests();
+
+
+  if(!requests[index])
+    return;
+
+
+  requests[index].status =
+    "REJECTED";
+
+
+  localStorage.setItem(
+    "jalwaRequests",
+    JSON.stringify(requests)
+  );
+
+
+  loadDashboard();
+  loadDeposits();
+  loadWithdrawals();
+  loadTransactions();
+
+  alert("Request rejected.");
+
+}
+
+
+/* =========================
+   TRANSACTIONS
+========================= */
+
+function loadTransactions(){
+
+  const requests =
+    getRequests();
+
+  const box =
+    document.getElementById("transactionsContent");
+
+
+  if(!requests.length){
+
+    box.innerHTML =
+      `<div class="empty">No transactions yet.</div>`;
+
+    return;
+  }
+
+
+  box.innerHTML = `
+
+    <div class="table-wrap">
+
+    <table>
+
+      <tr>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+
+      ${requests.slice().reverse().map(r => `
+
+        <tr>
+
+          <td>${r.type}</td>
+
+          <td>
+            Rs ${Number(r.amount || 0).toLocaleString()}
+          </td>
+
+          <td>${r.method || "-"}</td>
+
+          <td>
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
+            </span>
+          </td>
+
+          <td>${r.date || "-"}</td>
+
+        </tr>
+
+      `).join("")}
+
+    </table>
+
+    </div>
+  `;
+
+}
+
+
+/* =========================
+   NOTIFICATIONS
+========================= */
+
+function sendNotification(){
+
+  const text =
+    document
+      .getElementById("notificationText")
+      .value.trim();
+
+
+  if(!text){
+
+    alert("Write notification first.");
+
+    return;
+  }
+
+
+  const list =
+    JSON.parse(
+      localStorage.getItem("jalwaNotifications") || "[]"
+    );
+
+
+  list.push({
+    text:text,
+    date:new Date().toLocaleString()
+  });
+
+
+  localStorage.setItem(
+    "jalwaNotifications",
+    JSON.stringify(list)
+  );
+
+
+  document.getElementById("notificationText")
+    .value = "";
+
+
+  loadNotifications();
+
+  alert("Notification saved.");
+
+}
+
+
+function loadNotifications(){
+
+  const list =
+    JSON.parse(
+      localStorage.getItem("jalwaNotifications") || "[]"
+    );
+
+
+  const box =
+    document.getElementById("notificationList");
+
+
+  if(!list.length){
+
+    box.innerHTML =
+      `<div class="empty">No notifications.</div>`;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    list.slice().reverse().map(n => `
+
+      <div class="panel">
+
+        <div style="color:#ffe09a;">
+          ${n.text}
+        </div>
+
+        <div style="font-size:10px;color:#9f896b;margin-top:6px;">
+          ${n.date}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =========================
+   SETTINGS
+========================= */
+
+function saveSettings(){
+
+  const settings = {
+
+    method:
+      document.getElementById("paymentMethod").value,
+
+    number:
+      document.getElementById("paymentNumber").value,
+
+    name:
+      document.getElementById("paymentName").value
+
+  };
+
+
+  localStorage.setItem(
+    "jalwaSettings",
+    JSON.stringify(settings)
+  );
+
+
+  alert("Settings saved.");
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+window.addEventListener("load",() => {
+
+  const logged =
+    localStorage.getItem("jalwaAdminLogin");
+
+
+  if(logged === "true"){
+
+    showAdmin();
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
