@@ -7,7 +7,7 @@
 <meta name="description" content="JALWA PWA">
 <link rel="manifest" href="manifest.json">
 <title>JALWA</title>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 
 *{
@@ -1738,7 +1738,7 @@ function showLogin(){
 }
 
 
-function register(){
+async function register(){
 
   const name =
     document.getElementById("regName").value.trim();
@@ -1768,49 +1768,130 @@ function register(){
   }
 
 
-  const user = {
+  try{
 
-    name:name,
+    /* CHECK EXISTING PHONE */
 
-    phone:phone,
-
-    password:password,
-
-    referral:
-      referral ||
-      "JALWA" +
-      Math.floor(
-        1000 +
-        Math.random()*9000
-      ),
-
-    balance:0
-
-  };
+    const { data: existingUser, error: checkError } =
+      await db
+        .from("users")
+        .select("id")
+        .eq("phone", phone)
+        .maybeSingle();
 
 
-  localStorage.setItem(
-    "jalwaUser",
-    JSON.stringify(user)
-  );
+    if(checkError){
+
+      console.error(
+        "SUPABASE USER CHECK ERROR:",
+        checkError
+      );
+
+      toast(
+        "Could not check account."
+      );
+
+      return;
+
+    }
 
 
-  toast(
-    "Registration successful."
-  );
+    if(existingUser){
+
+      toast(
+        "This phone number is already registered."
+      );
+
+      return;
+
+    }
 
 
-  setTimeout(
-    () => {
-      showApp();
-    },
-    500
-  );
+    /* CREATE USER IN SUPABASE */
 
-}
+    const { data: newUser, error } =
+      await db
+        .from("users")
+        .insert({
+
+          name:
+            name,
+
+          phone:
+            phone,
+
+          password:
+            password,
+
+          referral:
+            referral ||
+            "JALWA" +
+            Math.floor(
+              1000 +
+              Math.random() * 9000
+            ),
+
+          balance:
+            0,
+
+          blocked:
+            false
+
+        })
+        .select()
+        .single();
 
 
-function login(){
+    if(error){
+
+      console.error(
+        "SUPABASE REGISTER ERROR:",
+        error
+      );
+
+      toast(
+        "Account could not be created."
+      );
+
+      return;
+
+    }
+
+
+    /* SAVE SUPABASE USER LOCALLY */
+
+    localStorage.setItem(
+      "jalwaUser",
+      JSON.stringify(
+        newUser
+      )
+    );
+
+
+    toast(
+      "Account created successfully."
+    );
+
+
+    /* OPEN APP */
+
+    showApp();
+
+
+    console.log(
+      "User saved in Supabase:",
+      newUser
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "REGISTER ERROR:",
+      error
+    );
+
+    async function login(){
 
   const phone =
     document
@@ -1824,14 +1905,10 @@ function login(){
       .value;
 
 
-  const saved =
-    localStorage.getItem("jalwaUser");
-
-
-  if(!saved){
+  if(!phone || !password){
 
     toast(
-      "No account found. Please register first."
+      "Please enter phone number and password."
     );
 
     return;
@@ -1839,28 +1916,83 @@ function login(){
   }
 
 
-  const user =
-    JSON.parse(saved);
+  try{
+
+    const { data: user, error } =
+      await db
+        .from("users")
+        .select("*")
+        .eq("phone", phone)
+        .eq("password", password)
+        .maybeSingle();
 
 
-  if(
-    phone !== user.phone ||
-    password !== user.password
-  ){
+    if(error){
 
-    toast(
-      "Invalid phone number or password."
+      console.error(
+        "SUPABASE LOGIN ERROR:",
+        error
+      );
+
+      toast(
+        "Could not login. Please try again."
+      );
+
+      return;
+
+    }
+
+
+    if(!user){
+
+      toast(
+        "Invalid phone number or password."
+      );
+
+      return;
+
+    }
+
+
+    if(user.blocked){
+
+      toast(
+        "Your account is blocked."
+      );
+
+      return;
+
+    }
+
+
+    localStorage.setItem(
+      "jalwaUser",
+      JSON.stringify(user)
     );
 
-    return;
+
+    toast(
+      "Login successful."
+    );
+
+
+    showApp();
+
+
+  }catch(error){
+
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
+
+    toast(
+      "Something went wrong. Please try again."
+    );
 
   }
-
-
-  showApp();
 
 }
-
 
 /* =========================
    SHOW APP
@@ -3269,54 +3401,42 @@ function toggleBankList(){
    SUBMIT REQUEST
 ========================= */
 
-function submitRequest(){
+async function submitRequest(){
 
-  const requests =
-    JSON.parse(
+  const savedUser =
+    localStorage.getItem("jalwaUser");
 
-      localStorage.getItem(
-        "jalwaRequests"
-      ) || "[]"
+  if(!savedUser){
 
-    );
+    toast("Please login first.");
+
+    return;
+
+  }
+
+  const user =
+    JSON.parse(savedUser);
 
 
-  if(
-    requestType ===
-    "deposit"
-  ){
+  /* =========================
+     DEPOSIT
+  ========================= */
+
+  if(requestType === "deposit"){
 
     const amount =
       Number(
-        document
-          .getElementById(
-            "reqAmount"
-          )
-          .value
+        document.getElementById("reqAmount").value
       );
 
-
     const ref =
-      document
-        .getElementById(
-          "reqRef"
-        )
-        .value
-        .trim();
-
+      document.getElementById("reqRef").value.trim();
 
     const shot =
-      document
-        .getElementById(
-          "reqShot"
-        )
-        .files[0];
+      document.getElementById("reqShot").files[0];
 
 
-    if(
-      !amount ||
-      amount <= 0
-    ){
+    if(!amount || amount <= 0){
 
       toast(
         "Please enter a valid deposit amount."
@@ -3327,197 +3447,310 @@ function submitRequest(){
     }
 
 
-    requests.push({
-
-      type:
-        "Deposit",
-
-      planNumber:
-        selectedPlanNumber,
-
-      method:
-        "Easypaisa",
-
-      destination:
-        "03221619080",
-
-      accountName:
-        "Akhtari Bibi",
-
-      amount:
-        amount,
-
-      reference:
-        ref,
-
-      screenshotName:
-        shot
-          ? shot.name
-          : "",
-
-      status:
-        "PENDING",
-
-      date:
-        new Date()
-          .toLocaleString()
-
-    });
+    let screenshotData = "";
 
 
-    localStorage.setItem(
+    /*
+      Convert screenshot to Data URL.
+      This allows the admin panel to see
+      the actual image.
+    */
 
-      "jalwaRequests",
+    if(shot){
 
-      JSON.stringify(
-        requests
-      )
+      if(!shot.type.startsWith("image/")){
 
-    );
+        toast(
+          "Please select an image file."
+        );
+
+        return;
+
+      }
+
+
+      if(shot.size > 2 * 1024 * 1024){
+
+        toast(
+          "Screenshot must be under 2 MB."
+        );
+
+        return;
+
+      }
+
+
+      try{
+
+        screenshotData =
+          await new Promise(
+            (resolve,reject) => {
+
+              const reader =
+                new FileReader();
+
+              reader.onload =
+                () => resolve(reader.result);
+
+              reader.onerror =
+                () => reject(
+                  new Error(
+                    "Image reading failed."
+                  )
+                );
+
+              reader.readAsDataURL(shot);
+
+            }
+          );
+
+      }catch(error){
+
+        console.error(error);
+
+        toast(
+          "Could not read screenshot."
+        );
+
+        return;
+
+      }
+
+    }
+
+
+    /*
+      Save request in Supabase
+    */
+
+    const { data, error } =
+      await db
+        .from("requests")
+        .insert({
+
+          user_id:
+            user.id || null,
+
+          type:
+            "Deposit",
+
+          amount:
+            amount,
+
+          status:
+            "PENDING",
+
+          method:
+            "Easypaisa",
+
+          phone:
+            user.phone || "",
+
+          screenshot:
+            screenshotData,
+
+          description:
+            JSON.stringify({
+
+              planNumber:
+                selectedPlanNumber,
+
+              destination:
+                "03221619080",
+
+              accountName:
+                "Akhtari Bibi",
+
+              reference:
+                ref,
+
+              screenshotName:
+                shot
+                  ? shot.name
+                  : ""
+
+            })
+
+        })
+        .select();
+
+
+    if(error){
+
+      console.error(
+        "SUPABASE DEPOSIT ERROR:",
+        error
+      );
+
+      toast(
+        "Deposit request could not be submitted."
+      );
+
+      return;
+
+    }
 
 
     closeModals();
 
-
     renderRequestHistory();
-
 
     toast(
       "Deposit request submitted — PENDING."
     );
 
-
-  }else{
-
-
-    const amount =
-      Number(
-        document
-          .getElementById(
-            "wdAmount"
-          )
-          .value
-      );
-
-
-    const method =
-      document
-        .getElementById(
-          "wdMethod"
-        )
-        .value
-        .trim();
-
-
-    const account =
-      document
-        .getElementById(
-          "wdAccount"
-        )
-        .value
-        .trim();
-
-
-    const name =
-      document
-        .getElementById(
-          "wdName"
-        )
-        .value
-        .trim();
-
-
-    if(!method){
-
-      toast(
-        "Please select a bank or wallet."
-      );
-
-      return;
-
-    }
-
-
-    if(
-      !amount ||
-      amount < 65
-    ){
-
-      toast(
-        "Minimum withdrawal is Rs 65."
-      );
-
-      return;
-
-    }
-
-
-    if(
-      !account ||
-      !name
-    ){
-
-      toast(
-        "Please enter account number and name."
-      );
-
-      return;
-
-    }
-
-
-    requests.push({
-
-      type:
-        "Withdrawal",
-
-      method:
-        method,
-
-      amount:
-        amount,
-
-      account:
-        account,
-
-      accountName:
-        name,
-
-      status:
-        "PENDING",
-
-      date:
-        new Date()
-          .toLocaleString()
-
-    });
-
-
-    localStorage.setItem(
-
-      "jalwaRequests",
-
-      JSON.stringify(
-        requests
-      )
-
+    console.log(
+      "Deposit saved in Supabase:",
+      data
     );
 
 
-    closeModals();
-
-
-    renderRequestHistory();
-
-
-    toast(
-      "Withdrawal request submitted — PENDING."
-    );
+    return;
 
   }
 
+
+  /* =========================
+     WITHDRAWAL
+  ========================= */
+
+  const amount =
+    Number(
+      document.getElementById("wdAmount").value
+    );
+
+  const method =
+    document
+      .getElementById("wdMethod")
+      .value
+      .trim();
+
+  const account =
+    document
+      .getElementById("wdAccount")
+      .value
+      .trim();
+
+  const name =
+    document
+      .getElementById("wdName")
+      .value
+      .trim();
+
+
+  if(!method){
+
+    toast(
+      "Please select a bank or wallet."
+    );
+
+    return;
+
+  }
+
+
+  if(!amount || amount < 65){
+
+    toast(
+      "Minimum withdrawal is Rs 65."
+    );
+
+    return;
+
+  }
+
+
+  if(!account || !name){
+
+    toast(
+      "Please enter account number and name."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Save withdrawal request
+    in Supabase
+  */
+
+  const { data, error } =
+    await db
+      .from("requests")
+      .insert({
+
+        user_id:
+          user.id || null,
+
+        type:
+          "Withdrawal",
+
+        amount:
+          amount,
+
+        status:
+          "PENDING",
+
+        method:
+          method,
+
+        phone:
+          account,
+
+        screenshot:
+          "",
+
+        description:
+          JSON.stringify({
+
+            account:
+              account,
+
+            accountName:
+              name
+
+          })
+
+      })
+      .select();
+
+
+  if(error){
+
+    console.error(
+      "SUPABASE WITHDRAWAL ERROR:",
+      error
+    );
+
+    toast(
+      "Withdrawal request could not be submitted."
+    );
+
+    return;
+
+  }
+
+
+  closeModals();
+
+  renderRequestHistory();
+
+  toast(
+    "Withdrawal request submitted — PENDING."
+  );
+
+
+  console.log(
+    "Withdrawal saved in Supabase:",
+    data
+  );
+
 }
 
+
+    
 
 /* =========================
    SELECT PLAN
@@ -4267,7 +4500,11 @@ window.addEventListener(
 
   }
 );
+const SUPABASE_URL = "https://fehzsmynaesiulqyxicn.supabase.co";
+const SUPABASE_KEY = "sb_publishable_YI2PrTeZf2lhCitYczR9_Q_99cdzvL8";
 
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
 
 </body>

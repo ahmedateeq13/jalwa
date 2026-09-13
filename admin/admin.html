@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JALWA Admin Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{
@@ -645,7 +646,51 @@ td{
 
 
 <script>
+const SUPABASE_URL =
+  "https://fehzsmynaesiulqyxicn.supabase.co";
 
+const SUPABASE_KEY =
+  "sb_publishable_YI2PrTeZf2lhCitYczR9_Q_99cdzvL8";
+
+const { createClient } = supabase;
+
+const db =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+  let adminRequestCache = {};
+  function openRequestImage(id){
+
+  const { data: request } =
+    adminRequestCache[id] || {};
+
+  if(!request || !request.screenshot){
+
+    alert("Screenshot available nahi hai.");
+
+    return;
+  }
+
+  document.getElementById("imagePreview").src =
+    request.screenshot;
+
+  document.getElementById("imageTitle").textContent =
+    "Deposit Screenshot";
+
+  document.getElementById("imageModal")
+    .classList.remove("hidden");
+}
+
+
+function closeImageModal(){
+
+  document.getElementById("imageModal")
+    .classList.add("hidden");
+
+  document.getElementById("imagePreview").src =
+    "";
+}
 /* =========================
    ADMIN LOGIN
 ========================= */
@@ -783,12 +828,29 @@ function showSection(id,button){
    REQUEST DATA
 ========================= */
 
-function getRequests(){
+async function getRequests(){
 
-  return JSON.parse(
-    localStorage.getItem("jalwaRequests") || "[]"
-  );
+  const { data, error } =
+    await db
+      .from("requests")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
 
+  if(error){
+
+    console.error(
+      "SUPABASE REQUEST ERROR:",
+      error
+    );
+
+    alert("Requests load nahi ho sakin.");
+
+    return [];
+  }
+
+  return data || [];
 }
 
 
@@ -796,43 +858,78 @@ function getRequests(){
    DASHBOARD
 ========================= */
 
-function loadDashboard(){
+async function loadDashboard(){
 
-  const requests = getRequests();
+  const { data: requests, error: requestError } =
+    await db
+      .from("requests")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
+
+  if(requestError){
+
+    console.error(
+      "SUPABASE DASHBOARD ERROR:",
+      requestError
+    );
+
+    alert("Dashboard data load nahi ho saka.");
+
+    return;
+  }
+
+  const { count: usersCount, error: usersError } =
+    await db
+      .from("users")
+      .select("id", {
+        count: "exact",
+        head: true
+      });
+
+  if(usersError){
+
+    console.error(
+      "SUPABASE USERS COUNT ERROR:",
+      usersError
+    );
+
+  }
 
   const deposits =
-    requests.filter(r =>
+    (requests || []).filter(r =>
       r.type === "Deposit" &&
       r.status === "PENDING"
     );
 
   const withdrawals =
-    requests.filter(r =>
+    (requests || []).filter(r =>
       r.type === "Withdrawal" &&
       r.status === "PENDING"
     );
 
-
   document.getElementById("totalUsers")
     .textContent =
-      localStorage.getItem("jalwaUser") ? "1" : "0";
+      usersCount || 0;
 
   document.getElementById("pendingDeposits")
-    .textContent = deposits.length;
+    .textContent =
+      deposits.length;
 
   document.getElementById("pendingWithdrawals")
-    .textContent = withdrawals.length;
+    .textContent =
+      withdrawals.length;
 
   document.getElementById("totalTransactions")
-    .textContent = requests.length;
-
+    .textContent =
+      (requests || []).length;
 
   const recent =
-    requests.slice(-5).reverse();
+    (requests || []).slice(0, 5);
 
   const box =
     document.getElementById("recentRequests");
-
 
   if(!recent.length){
 
@@ -842,10 +939,10 @@ function loadDashboard(){
     return;
   }
 
-
   box.innerHTML = `
     <div class="table-wrap">
     <table>
+
       <tr>
         <th>Type</th>
         <th>Amount</th>
@@ -857,17 +954,25 @@ function loadDashboard(){
 
         <tr>
 
-          <td>${r.type}</td>
-
-          <td>Rs ${Number(r.amount || 0).toLocaleString()}</td>
+          <td>${r.type || "-"}</td>
 
           <td>
-            <span class="badge ${r.status.toLowerCase()}">
-              ${r.status}
+            Rs ${Number(r.amount || 0).toLocaleString()}
+          </td>
+
+          <td>
+            <span class="badge ${String(r.status || "").toLowerCase()}">
+              ${r.status || "-"}
             </span>
           </td>
 
-          <td>${r.date || "-"}</td>
+          <td>
+            ${
+              r.created_at
+                ? new Date(r.created_at).toLocaleString()
+                : "-"
+            }
+          </td>
 
         </tr>
 
@@ -876,7 +981,6 @@ function loadDashboard(){
     </table>
     </div>
   `;
-
 }
 
 
@@ -884,27 +988,39 @@ function loadDashboard(){
    USERS
 ========================= */
 
-function loadUsers(){
-
-  const saved =
-    localStorage.getItem("jalwaUser");
+async function loadUsers(){
 
   const box =
     document.getElementById("usersContent");
 
+  const { data: users, error } =
+    await db
+      .from("users")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
 
-  if(!saved){
+  if(error){
+
+    console.error(
+      "SUPABASE USERS ERROR:",
+      error
+    );
+
+    box.innerHTML =
+      `<div class="empty">Users load nahi ho sake.</div>`;
+
+    return;
+  }
+
+  if(!users || !users.length){
 
     box.innerHTML =
       `<div class="empty">No users found.</div>`;
 
     return;
   }
-
-
-  const user =
-    JSON.parse(saved);
-
 
   box.innerHTML = `
 
@@ -920,38 +1036,41 @@ function loadUsers(){
         <th>Action</th>
       </tr>
 
-      <tr>
+      ${users.map(user => `
 
-        <td>${user.name || "-"}</td>
+        <tr>
 
-        <td>${user.phone || "-"}</td>
+          <td>${user.name || "-"}</td>
 
-        <td>
-          Rs ${Number(user.balance || 0).toLocaleString()}
-        </td>
+          <td>${user.phone || "-"}</td>
 
-        <td>${user.referral || "-"}</td>
+          <td>
+            Rs ${Number(user.balance || 0).toLocaleString()}
+          </td>
 
-        <td>
-          <button
-            class="action block"
-            onclick="adjustBalance()"
-          >
-            Balance
-          </button>
-        </td>
+          <td>${user.referral || "-"}</td>
 
-      </tr>
+          <td>
+            <button
+              class="action block"
+              onclick="adjustBalance(${user.id})"
+            >
+              Balance
+            </button>
+          </td>
+
+        </tr>
+
+      `).join("")}
 
     </table>
 
     </div>
   `;
-
 }
 
 
-function adjustBalance(){
+async function adjustBalance(userId){
 
   const amount =
     prompt("Enter new balance:");
@@ -969,59 +1088,88 @@ function adjustBalance(){
     return;
   }
 
+  const { data: user, error: getError } =
+    await db
+      .from("users")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
 
-  const saved =
-    localStorage.getItem("jalwaUser");
+  if(getError || !user){
 
-  if(!saved) return;
+    console.error(
+      "GET USER ERROR:",
+      getError
+    );
 
+    alert("User nahi mila.");
 
-  const user =
-    JSON.parse(saved);
+    return;
+  }
 
-  user.balance = value;
+  const { error: updateError } =
+    await db
+      .from("users")
+      .update({
+        balance: value
+      })
+      .eq("id", userId);
 
+  if(updateError){
 
-  localStorage.setItem(
-    "jalwaUser",
-    JSON.stringify(user)
-  );
+    console.error(
+      "UPDATE BALANCE ERROR:",
+      updateError
+    );
 
+    alert("Balance update nahi ho saka.");
+
+    return;
+  }
 
   loadUsers();
-
   loadDashboard();
 
-  alert("Balance updated.");
-
+  alert("Balance updated successfully.");
 }
-
-
 /* =========================
    DEPOSITS
 ========================= */
 
-function loadDeposits(){
-
-  const requests = getRequests();
-
-  const deposits =
-    requests.filter(r =>
-      r.type === "Deposit"
-    );
+async function loadDeposits(){
 
   const box =
     document.getElementById("depositsContent");
 
+  const { data: deposits, error } =
+    await db
+      .from("requests")
+      .select("*")
+      .eq("type", "Deposit")
+      .order("created_at", {
+        ascending: false
+      });
 
-  if(!deposits.length){
+  if(error){
+
+    console.error(
+      "SUPABASE DEPOSITS ERROR:",
+      error
+    );
+
+    box.innerHTML =
+      `<div class="empty">Deposits load nahi ho sakin.</div>`;
+
+    return;
+  }
+
+  if(!deposits || !deposits.length){
 
     box.innerHTML =
       `<div class="empty">No deposit requests.</div>`;
 
     return;
   }
-
 
   box.innerHTML = `
 
@@ -1033,15 +1181,25 @@ function loadDeposits(){
         <th>Amount</th>
         <th>Method</th>
         <th>Reference</th>
+        <th>Screenshot</th>
         <th>Status</th>
         <th>Date</th>
         <th>Action</th>
       </tr>
 
-      ${deposits.map((r,index) => {
+      ${deposits.map(r => {
+adminRequestCache[r.id] = r;
+        let desc = {};
 
-        const realIndex =
-          requests.indexOf(r);
+        try{
+          desc =
+            JSON.parse(
+              r.description || "{}"
+            );
+        }catch(e){}
+
+        const reference =
+          desc.reference || "-";
 
         return `
 
@@ -1051,36 +1209,67 @@ function loadDeposits(){
             Rs ${Number(r.amount || 0).toLocaleString()}
           </td>
 
-          <td>${r.method || "-"}</td>
-
-          <td>${r.reference || "-"}</td>
-
           <td>
-            <span class="badge ${r.status.toLowerCase()}">
-              ${r.status}
-            </span>
+            ${r.method || "-"}
           </td>
 
-          <td>${r.date || "-"}</td>
+          <td>
+            ${reference}
+          </td>
+
+          <td>
+
+            ${
+              r.screenshot
+              ? `
+                <button
+                  class="action approve"
+                  onclick="openRequestImage(${r.id})"
+                >
+                  VIEW
+                </button>
+              `
+              : "-"
+            }
+
+          </td>
+
+          <td>
+
+            <span class="badge ${String(r.status || "").toLowerCase()}">
+              ${r.status || "-"}
+            </span>
+
+          </td>
+
+          <td>
+            ${
+              r.created_at
+              ? new Date(r.created_at).toLocaleString()
+              : "-"
+            }
+          </td>
 
           <td>
 
             ${
               r.status === "PENDING"
               ? `
+
                 <button
                   class="action approve"
-                  onclick="approveRequest(${realIndex})"
+                  onclick="approveRequest(${r.id})"
                 >
                   APPROVE
                 </button>
 
                 <button
                   class="action reject"
-                  onclick="rejectRequest(${realIndex})"
+                  onclick="rejectRequest(${r.id})"
                 >
                   REJECT
                 </button>
+
               `
               : "-"
             }
@@ -1097,35 +1286,46 @@ function loadDeposits(){
 
     </div>
   `;
-
 }
-
 
 /* =========================
    WITHDRAWALS
 ========================= */
 
-function loadWithdrawals(){
-
-  const requests = getRequests();
-
-  const withdrawals =
-    requests.filter(r =>
-      r.type === "Withdrawal"
-    );
+async function loadWithdrawals(){
 
   const box =
     document.getElementById("withdrawalsContent");
 
+  const { data: withdrawals, error } =
+    await db
+      .from("requests")
+      .select("*")
+      .eq("type", "Withdrawal")
+      .order("created_at", {
+        ascending: false
+      });
 
-  if(!withdrawals.length){
+  if(error){
+
+    console.error(
+      "SUPABASE WITHDRAWALS ERROR:",
+      error
+    );
+
+    box.innerHTML =
+      `<div class="empty">Withdrawals load nahi ho sakin.</div>`;
+
+    return;
+  }
+
+  if(!withdrawals || !withdrawals.length){
 
     box.innerHTML =
       `<div class="empty">No withdrawal requests.</div>`;
 
     return;
   }
-
 
   box.innerHTML = `
 
@@ -1136,17 +1336,32 @@ function loadWithdrawals(){
       <tr>
         <th>Amount</th>
         <th>Method</th>
-        <th>Bank</th>
         <th>Number</th>
         <th>Name</th>
         <th>Status</th>
+        <th>Date</th>
         <th>Action</th>
       </tr>
 
       ${withdrawals.map(r => {
 
-        const realIndex =
-          requests.indexOf(r);
+        let desc = {};
+
+        try{
+          desc =
+            JSON.parse(
+              r.description || "{}"
+            );
+        }catch(e){}
+
+        const account =
+          desc.account ||
+          r.phone ||
+          "-";
+
+        const accountName =
+          desc.accountName ||
+          "-";
 
         return `
 
@@ -1156,18 +1371,30 @@ function loadWithdrawals(){
             Rs ${Number(r.amount || 0).toLocaleString()}
           </td>
 
-          <td>${r.method || "-"}</td>
-
-          <td>${r.bank || "-"}</td>
-
-          <td>${r.account || "-"}</td>
-
-          <td>${r.accountName || "-"}</td>
+          <td>
+            ${r.method || "-"}
+          </td>
 
           <td>
-            <span class="badge ${r.status.toLowerCase()}">
-              ${r.status}
+            ${account}
+          </td>
+
+          <td>
+            ${accountName}
+          </td>
+
+          <td>
+            <span class="badge ${String(r.status || "").toLowerCase()}">
+              ${r.status || "-"}
             </span>
+          </td>
+
+          <td>
+            ${
+              r.created_at
+              ? new Date(r.created_at).toLocaleString()
+              : "-"
+            }
           </td>
 
           <td>
@@ -1175,19 +1402,21 @@ function loadWithdrawals(){
             ${
               r.status === "PENDING"
               ? `
+
                 <button
                   class="action approve"
-                  onclick="approveRequest(${realIndex})"
+                  onclick="approveRequest(${r.id})"
                 >
                   APPROVE
                 </button>
 
                 <button
                   class="action reject"
-                  onclick="rejectRequest(${realIndex})"
+                  onclick="rejectRequest(${r.id})"
                 >
                   REJECT
                 </button>
+
               `
               : "-"
             }
@@ -1204,159 +1433,293 @@ function loadWithdrawals(){
 
     </div>
   `;
-
 }
-
-
 /* =========================
    APPROVE
 ========================= */
 
-function approveRequest(index){
+/* =========================
+   APPROVE REQUEST
+========================= */
 
-  const requests =
-    getRequests();
+async function approveRequest(id){
 
-  const request =
-    requests[index];
+  const { data: request, error: requestError } =
+    await db
+      .from("requests")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
+  if(requestError || !request){
 
-  if(!request)
+    console.error(
+      "GET REQUEST ERROR:",
+      requestError
+    );
+
+    alert("Request nahi mili.");
     return;
+  }
 
+  if(request.status !== "PENDING"){
 
-  request.status =
-    "APPROVED";
+    alert("Ye request already process ho chuki hai.");
+    return;
+  }
 
+  const { data: user, error: userError } =
+    await db
+      .from("users")
+      .select("*")
+      .eq("id", request.user_id)
+      .maybeSingle();
 
-  /*
-    DEMO BALANCE UPDATE
+  if(userError || !user){
 
-    Deposit approved:
-    amount is added to user balance.
+    console.error(
+      "GET USER ERROR:",
+      userError
+    );
 
-    Withdrawal approved:
-    amount is deducted.
-  */
+    alert("User nahi mila.");
+    return;
+  }
 
-  const saved =
-    localStorage.getItem("jalwaUser");
+  const amount =
+    Number(request.amount || 0);
 
+  let newBalance =
+    Number(user.balance || 0);
 
-  if(saved){
+  /* =========================
+     DEPOSIT
+  ========================= */
 
-    const user =
-      JSON.parse(saved);
+  if(request.type === "Deposit"){
 
-    const amount =
-      Number(request.amount || 0);
+    newBalance =
+      newBalance + amount;
+  }
 
+  /* =========================
+     WITHDRAWAL
+  ========================= */
 
-    if(request.type === "Deposit"){
+  if(request.type === "Withdrawal"){
 
-      user.balance =
-      Number(user.balance || 0) + (amount * 0.25);
+    if(newBalance < amount){
 
+      alert(
+        "User balance is insufficient for this withdrawal."
+      );
+
+      return;
     }
-if(request.type === "Deposit" && request.planNumber){
 
-  localStorage.setItem(
-    "jalwa_plan_" + request.planNumber,
-    Date.now().toString()
-  );
+    newBalance =
+      newBalance - amount;
+  }
 
-}
+  /* =========================
+     UPDATE USER BALANCE
+  ========================= */
 
-    if(request.type === "Withdrawal"){
+  const { error: balanceError } =
+    await db
+      .from("users")
+      .update({
+        balance: newBalance
+      })
+      .eq("id", user.id);
 
-      user.balance =
-        Math.max(
-          0,
-          Number(user.balance || 0) - amount
-        );
+  if(balanceError){
 
-    }
+    console.error(
+      "BALANCE UPDATE ERROR:",
+      balanceError
+    );
 
+    alert("Balance update nahi ho saka.");
+    return;
+  }
 
-    localStorage.setItem(
-      "jalwaUser",
-      JSON.stringify(user)
+  /* =========================
+     APPROVE REQUEST
+  ========================= */
+
+  const { error: approveError } =
+    await db
+      .from("requests")
+      .update({
+        status: "APPROVED"
+      })
+      .eq("id", id);
+
+  if(approveError){
+
+    console.error(
+      "APPROVE REQUEST ERROR:",
+      approveError
+    );
+
+    alert("Request approve nahi ho saki.");
+    return;
+  }
+
+  /* =========================
+     TRANSACTION
+  ========================= */
+
+  const { error: transactionError } =
+    await db
+      .from("transactions")
+      .insert({
+
+        user_id:
+          request.user_id,
+
+        type:
+          request.type,
+
+        amount:
+          amount,
+
+        status:
+          "completed",
+
+        description:
+          request.type === "Deposit"
+            ? "Deposit approved"
+            : "Withdrawal approved"
+
+      });
+
+  if(transactionError){
+
+    console.error(
+      "TRANSACTION ERROR:",
+      transactionError
     );
 
   }
 
-
-  localStorage.setItem(
-    "jalwaRequests",
-    JSON.stringify(requests)
-  );
-
+  /* =========================
+     REFRESH ADMIN PANEL
+  ========================= */
 
   loadDashboard();
   loadDeposits();
   loadWithdrawals();
   loadTransactions();
 
-  alert("Request approved.");
-
+  alert(
+    request.type +
+    " approved successfully."
+  );
 }
 
 
 /* =========================
-   REJECT
+   REJECT REQUEST
 ========================= */
 
-function rejectRequest(index){
+async function rejectRequest(id){
 
-  const requests =
-    getRequests();
+  const { data: request, error: requestError } =
+    await db
+      .from("requests")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
+  if(requestError || !request){
 
-  if(!requests[index])
+    console.error(
+      "GET REQUEST ERROR:",
+      requestError
+    );
+
+    alert("Request nahi mili.");
     return;
+  }
 
+  if(request.status !== "PENDING"){
 
-  requests[index].status =
-    "REJECTED";
+    alert("Ye request already process ho chuki hai.");
+    return;
+  }
 
+  const { error } =
+    await db
+      .from("requests")
+      .update({
+        status: "REJECTED"
+      })
+      .eq("id", id);
 
-  localStorage.setItem(
-    "jalwaRequests",
-    JSON.stringify(requests)
-  );
+  if(error){
 
+    console.error(
+      "REJECT REQUEST ERROR:",
+      error
+    );
+
+    alert("Request reject nahi ho saki.");
+    return;
+  }
+
+  /* =========================
+     REFRESH ADMIN PANEL
+  ========================= */
 
   loadDashboard();
   loadDeposits();
   loadWithdrawals();
-  loadTransactions();
 
-  alert("Request rejected.");
-
+  alert(
+    request.type +
+    " rejected successfully."
+  );
 }
-
 
 /* =========================
    TRANSACTIONS
 ========================= */
 
-function loadTransactions(){
-
-  const requests =
-    getRequests();
+async function loadTransactions(){
 
   const box =
     document.getElementById("transactionsContent");
 
+  const { data: transactions, error } =
+    await db
+      .from("transactions")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
 
-  if(!requests.length){
+  if(error){
+
+    console.error(
+      "SUPABASE TRANSACTIONS ERROR:",
+      error
+    );
+
+    box.innerHTML =
+      `<div class="empty">Transactions load nahi ho sakin.</div>`;
+
+    return;
+  }
+
+  if(!transactions || !transactions.length){
 
     box.innerHTML =
       `<div class="empty">No transactions yet.</div>`;
 
     return;
   }
-
 
   box.innerHTML = `
 
@@ -1367,30 +1730,40 @@ function loadTransactions(){
       <tr>
         <th>Type</th>
         <th>Amount</th>
-        <th>Method</th>
         <th>Status</th>
+        <th>Description</th>
         <th>Date</th>
       </tr>
 
-      ${requests.slice().reverse().map(r => `
+      ${transactions.map(t => `
 
         <tr>
 
-          <td>${r.type}</td>
-
           <td>
-            Rs ${Number(r.amount || 0).toLocaleString()}
+            ${t.type || "-"}
           </td>
 
-          <td>${r.method || "-"}</td>
+          <td>
+            Rs ${Number(t.amount || 0).toLocaleString()}
+          </td>
 
           <td>
-            <span class="badge ${r.status.toLowerCase()}">
-              ${r.status}
+            <span class="badge ${String(t.status || "").toLowerCase()}">
+              ${t.status || "-"}
             </span>
           </td>
 
-          <td>${r.date || "-"}</td>
+          <td>
+            ${t.description || "-"}
+          </td>
+
+          <td>
+            ${
+              t.created_at
+              ? new Date(t.created_at).toLocaleString()
+              : "-"
+            }
+          </td>
 
         </tr>
 
@@ -1400,10 +1773,7 @@ function loadTransactions(){
 
     </div>
   `;
-
 }
-
-
 /* =========================
    NOTIFICATIONS
 ========================= */
@@ -1544,6 +1914,35 @@ window.addEventListener("load",() => {
 });
 
 </script>
+<div id="imageModal" class="image-modal hidden" onclick="closeImageModal()">
 
+  <div
+    class="image-modal-box"
+    onclick="event.stopPropagation()"
+  >
+
+    <button
+      class="close-image"
+      onclick="closeImageModal()"
+    >
+      ×
+    </button>
+
+    <div
+      id="imageTitle"
+      class="image-title"
+    >
+      Deposit Screenshot
+    </div>
+
+    <img
+      id="imagePreview"
+      src=""
+      alt="Deposit Screenshot"
+    >
+
+  </div>
+
+</div>
 </body>
 </html>
