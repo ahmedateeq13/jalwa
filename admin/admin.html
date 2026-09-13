@@ -660,10 +660,10 @@ const db =
     SUPABASE_KEY
   );
   let adminRequestCache = {};
-  function openRequestImage(id){
+ function openRequestImage(id){
 
-  const { data: request } =
-    adminRequestCache[id] || {};
+  const request =
+    adminRequestCache[id];
 
   if(!request || !request.screenshot){
 
@@ -681,8 +681,6 @@ const db =
   document.getElementById("imageModal")
     .classList.remove("hidden");
 }
-
-
 function closeImageModal(){
 
   document.getElementById("imageModal")
