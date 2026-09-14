@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JALWA Admin Panel</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{
@@ -398,56 +397,56 @@ td{
       class="menu-btn active"
       onclick="showSection('dashboard',this)"
     >
-      📊 Dashboard
+      Dashboard
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('users',this)"
     >
-      👥 Users
+      Users
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('deposits',this)"
     >
-      💰 Deposits
+      Deposits
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('withdrawals',this)"
     >
-      💸 Withdrawals
+      Withdrawals
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('transactions',this)"
     >
-      💳 Transactions
+      Transactions
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('notifications',this)"
     >
-      🔔 Notifications
+      Notifications
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('settings',this)"
     >
-      ⚙️ Settings
+      Settings
     </button>
 
     <button
       class="menu-btn logout"
       onclick="adminLogout()"
     >
-      🚪 Logout
+      Logout
     </button>
 
   </aside>
@@ -646,49 +645,7 @@ td{
 
 
 <script>
-const SUPABASE_URL =
-  "https://fehzsmynaesiulqyxicn.supabase.co";
 
-const SUPABASE_KEY =
-  "sb_publishable_YI2PrTeZf2lhCitYczR9_Q_99cdzvL8";
-
-const { createClient } = supabase;
-
-const db =
-  createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-  let adminRequestCache = {};
- function openRequestImage(id){
-
-  const request =
-    adminRequestCache[id];
-
-  if(!request || !request.screenshot){
-
-    alert("Screenshot available nahi hai.");
-
-    return;
-  }
-
-  document.getElementById("imagePreview").src =
-    request.screenshot;
-
-  document.getElementById("imageTitle").textContent =
-    "Deposit Screenshot";
-
-  document.getElementById("imageModal")
-    .classList.remove("hidden");
-}
-function closeImageModal(){
-
-  document.getElementById("imageModal")
-    .classList.add("hidden");
-
-  document.getElementById("imagePreview").src =
-    "";
-}
 /* =========================
    ADMIN LOGIN
 ========================= */
@@ -719,6 +676,7 @@ function adminLogin(){
     );
 
     showAdmin();
+    loadSettings();
 
   }else{
 
@@ -826,29 +784,12 @@ function showSection(id,button){
    REQUEST DATA
 ========================= */
 
-async function getRequests(){
+function getRequests(){
 
-  const { data, error } =
-    await db
-      .from("requests")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
+  return JSON.parse(
+    localStorage.getItem("jalwaRequests") || "[]"
+  );
 
-  if(error){
-
-    console.error(
-      "SUPABASE REQUEST ERROR:",
-      error
-    );
-
-    alert("Requests load nahi ho sakin.");
-
-    return [];
-  }
-
-  return data || [];
 }
 
 
@@ -856,78 +797,43 @@ async function getRequests(){
    DASHBOARD
 ========================= */
 
-async function loadDashboard(){
+function loadDashboard(){
 
-  const { data: requests, error: requestError } =
-    await db
-      .from("requests")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
-
-  if(requestError){
-
-    console.error(
-      "SUPABASE DASHBOARD ERROR:",
-      requestError
-    );
-
-    alert("Dashboard data load nahi ho saka.");
-
-    return;
-  }
-
-  const { count: usersCount, error: usersError } =
-    await db
-      .from("users")
-      .select("id", {
-        count: "exact",
-        head: true
-      });
-
-  if(usersError){
-
-    console.error(
-      "SUPABASE USERS COUNT ERROR:",
-      usersError
-    );
-
-  }
+  const requests = getRequests();
 
   const deposits =
-    (requests || []).filter(r =>
+    requests.filter(r =>
       r.type === "Deposit" &&
       r.status === "PENDING"
     );
 
   const withdrawals =
-    (requests || []).filter(r =>
+    requests.filter(r =>
       r.type === "Withdrawal" &&
       r.status === "PENDING"
     );
 
+
   document.getElementById("totalUsers")
     .textContent =
-      usersCount || 0;
+      localStorage.getItem("jalwaUser") ? "1" : "0";
 
   document.getElementById("pendingDeposits")
-    .textContent =
-      deposits.length;
+    .textContent = deposits.length;
 
   document.getElementById("pendingWithdrawals")
-    .textContent =
-      withdrawals.length;
+    .textContent = withdrawals.length;
 
   document.getElementById("totalTransactions")
-    .textContent =
-      (requests || []).length;
+    .textContent = requests.length;
+
 
   const recent =
-    (requests || []).slice(0, 5);
+    requests.slice(-5).reverse();
 
   const box =
     document.getElementById("recentRequests");
+
 
   if(!recent.length){
 
@@ -937,10 +843,10 @@ async function loadDashboard(){
     return;
   }
 
+
   box.innerHTML = `
     <div class="table-wrap">
     <table>
-
       <tr>
         <th>Type</th>
         <th>Amount</th>
@@ -952,25 +858,17 @@ async function loadDashboard(){
 
         <tr>
 
-          <td>${r.type || "-"}</td>
+          <td>${r.type}</td>
+
+          <td>Rs ${Number(r.amount || 0).toLocaleString()}</td>
 
           <td>
-            Rs ${Number(r.amount || 0).toLocaleString()}
-          </td>
-
-          <td>
-            <span class="badge ${String(r.status || "").toLowerCase()}">
-              ${r.status || "-"}
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
             </span>
           </td>
 
-          <td>
-            ${
-              r.created_at
-                ? new Date(r.created_at).toLocaleString()
-                : "-"
-            }
-          </td>
+          <td>${r.date || "-"}</td>
 
         </tr>
 
@@ -979,6 +877,7 @@ async function loadDashboard(){
     </table>
     </div>
   `;
+
 }
 
 
@@ -986,39 +885,27 @@ async function loadDashboard(){
    USERS
 ========================= */
 
-async function loadUsers(){
+function loadUsers(){
+
+  const saved =
+    localStorage.getItem("jalwaUser");
 
   const box =
     document.getElementById("usersContent");
 
-  const { data: users, error } =
-    await db
-      .from("users")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
 
-  if(error){
-
-    console.error(
-      "SUPABASE USERS ERROR:",
-      error
-    );
-
-    box.innerHTML =
-      `<div class="empty">Users load nahi ho sake.</div>`;
-
-    return;
-  }
-
-  if(!users || !users.length){
+  if(!saved){
 
     box.innerHTML =
       `<div class="empty">No users found.</div>`;
 
     return;
   }
+
+
+  const user =
+    JSON.parse(saved);
+
 
   box.innerHTML = `
 
@@ -1034,41 +921,38 @@ async function loadUsers(){
         <th>Action</th>
       </tr>
 
-      ${users.map(user => `
+      <tr>
 
-        <tr>
+        <td>${user.name || "-"}</td>
 
-          <td>${user.name || "-"}</td>
+        <td>${user.phone || "-"}</td>
 
-          <td>${user.phone || "-"}</td>
+        <td>
+          Rs ${Number(user.balance || 0).toLocaleString()}
+        </td>
 
-          <td>
-            Rs ${Number(user.balance || 0).toLocaleString()}
-          </td>
+        <td>${user.referral || "-"}</td>
 
-          <td>${user.referral || "-"}</td>
+        <td>
+          <button
+            class="action block"
+            onclick="adjustBalance()"
+          >
+            Balance
+          </button>
+        </td>
 
-          <td>
-            <button
-              class="action block"
-              onclick="adjustBalance(${user.id})"
-            >
-              Balance
-            </button>
-          </td>
-
-        </tr>
-
-      `).join("")}
+      </tr>
 
     </table>
 
     </div>
   `;
+
 }
 
 
-async function adjustBalance(userId){
+function adjustBalance(){
 
   const amount =
     prompt("Enter new balance:");
@@ -1086,88 +970,59 @@ async function adjustBalance(userId){
     return;
   }
 
-  const { data: user, error: getError } =
-    await db
-      .from("users")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
 
-  if(getError || !user){
+  const saved =
+    localStorage.getItem("jalwaUser");
 
-    console.error(
-      "GET USER ERROR:",
-      getError
-    );
+  if(!saved) return;
 
-    alert("User nahi mila.");
 
-    return;
-  }
+  const user =
+    JSON.parse(saved);
 
-  const { error: updateError } =
-    await db
-      .from("users")
-      .update({
-        balance: value
-      })
-      .eq("id", userId);
+  user.balance = value;
 
-  if(updateError){
 
-    console.error(
-      "UPDATE BALANCE ERROR:",
-      updateError
-    );
+  localStorage.setItem(
+    "jalwaUser",
+    JSON.stringify(user)
+  );
 
-    alert("Balance update nahi ho saka.");
-
-    return;
-  }
 
   loadUsers();
+
   loadDashboard();
 
-  alert("Balance updated successfully.");
+  alert("Balance updated.");
+
 }
+
+
 /* =========================
    DEPOSITS
 ========================= */
 
-async function loadDeposits(){
+function loadDeposits(){
+
+  const requests = getRequests();
+
+  const deposits =
+    requests.filter(r =>
+      r.type === "Deposit"
+    );
 
   const box =
     document.getElementById("depositsContent");
 
-  const { data: deposits, error } =
-    await db
-      .from("requests")
-      .select("*")
-      .eq("type", "Deposit")
-      .order("created_at", {
-        ascending: false
-      });
 
-  if(error){
-
-    console.error(
-      "SUPABASE DEPOSITS ERROR:",
-      error
-    );
-
-    box.innerHTML =
-      `<div class="empty">Deposits load nahi ho sakin.</div>`;
-
-    return;
-  }
-
-  if(!deposits || !deposits.length){
+  if(!deposits.length){
 
     box.innerHTML =
       `<div class="empty">No deposit requests.</div>`;
 
     return;
   }
+
 
   box.innerHTML = `
 
@@ -1179,25 +1034,15 @@ async function loadDeposits(){
         <th>Amount</th>
         <th>Method</th>
         <th>Reference</th>
-        <th>Screenshot</th>
         <th>Status</th>
         <th>Date</th>
         <th>Action</th>
       </tr>
 
-      ${deposits.map(r => {
-adminRequestCache[r.id] = r;
-        let desc = {};
+      ${deposits.map((r,index) => {
 
-        try{
-          desc =
-            JSON.parse(
-              r.description || "{}"
-            );
-        }catch(e){}
-
-        const reference =
-          desc.reference || "-";
+        const realIndex =
+          requests.indexOf(r);
 
         return `
 
@@ -1207,67 +1052,36 @@ adminRequestCache[r.id] = r;
             Rs ${Number(r.amount || 0).toLocaleString()}
           </td>
 
-          <td>
-            ${r.method || "-"}
-          </td>
+          <td>${r.method || "-"}</td>
+
+          <td>${r.reference || "-"}</td>
 
           <td>
-            ${reference}
-          </td>
-
-          <td>
-
-            ${
-              r.screenshot
-              ? `
-                <button
-                  class="action approve"
-                  onclick="openRequestImage(${r.id})"
-                >
-                  VIEW
-                </button>
-              `
-              : "-"
-            }
-
-          </td>
-
-          <td>
-
-            <span class="badge ${String(r.status || "").toLowerCase()}">
-              ${r.status || "-"}
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
             </span>
-
           </td>
 
-          <td>
-            ${
-              r.created_at
-              ? new Date(r.created_at).toLocaleString()
-              : "-"
-            }
-          </td>
+          <td>${r.date || "-"}</td>
 
           <td>
 
             ${
               r.status === "PENDING"
               ? `
-
                 <button
                   class="action approve"
-                  onclick="approveRequest(${r.id})"
+                  onclick="approveRequest(${realIndex})"
                 >
                   APPROVE
                 </button>
 
                 <button
                   class="action reject"
-                  onclick="rejectRequest(${r.id})"
+                  onclick="rejectRequest(${realIndex})"
                 >
                   REJECT
                 </button>
-
               `
               : "-"
             }
@@ -1284,46 +1098,35 @@ adminRequestCache[r.id] = r;
 
     </div>
   `;
+
 }
+
 
 /* =========================
    WITHDRAWALS
 ========================= */
 
-async function loadWithdrawals(){
+function loadWithdrawals(){
+
+  const requests = getRequests();
+
+  const withdrawals =
+    requests.filter(r =>
+      r.type === "Withdrawal"
+    );
 
   const box =
     document.getElementById("withdrawalsContent");
 
-  const { data: withdrawals, error } =
-    await db
-      .from("requests")
-      .select("*")
-      .eq("type", "Withdrawal")
-      .order("created_at", {
-        ascending: false
-      });
 
-  if(error){
-
-    console.error(
-      "SUPABASE WITHDRAWALS ERROR:",
-      error
-    );
-
-    box.innerHTML =
-      `<div class="empty">Withdrawals load nahi ho sakin.</div>`;
-
-    return;
-  }
-
-  if(!withdrawals || !withdrawals.length){
+  if(!withdrawals.length){
 
     box.innerHTML =
       `<div class="empty">No withdrawal requests.</div>`;
 
     return;
   }
+
 
   box.innerHTML = `
 
@@ -1334,32 +1137,17 @@ async function loadWithdrawals(){
       <tr>
         <th>Amount</th>
         <th>Method</th>
+        <th>Bank</th>
         <th>Number</th>
         <th>Name</th>
         <th>Status</th>
-        <th>Date</th>
         <th>Action</th>
       </tr>
 
       ${withdrawals.map(r => {
 
-        let desc = {};
-
-        try{
-          desc =
-            JSON.parse(
-              r.description || "{}"
-            );
-        }catch(e){}
-
-        const account =
-          desc.account ||
-          r.phone ||
-          "-";
-
-        const accountName =
-          desc.accountName ||
-          "-";
+        const realIndex =
+          requests.indexOf(r);
 
         return `
 
@@ -1369,30 +1157,18 @@ async function loadWithdrawals(){
             Rs ${Number(r.amount || 0).toLocaleString()}
           </td>
 
-          <td>
-            ${r.method || "-"}
-          </td>
+          <td>${r.method || "-"}</td>
+
+          <td>${r.bank || "-"}</td>
+
+          <td>${r.account || "-"}</td>
+
+          <td>${r.accountName || "-"}</td>
 
           <td>
-            ${account}
-          </td>
-
-          <td>
-            ${accountName}
-          </td>
-
-          <td>
-            <span class="badge ${String(r.status || "").toLowerCase()}">
-              ${r.status || "-"}
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
             </span>
-          </td>
-
-          <td>
-            ${
-              r.created_at
-              ? new Date(r.created_at).toLocaleString()
-              : "-"
-            }
           </td>
 
           <td>
@@ -1400,21 +1176,19 @@ async function loadWithdrawals(){
             ${
               r.status === "PENDING"
               ? `
-
                 <button
                   class="action approve"
-                  onclick="approveRequest(${r.id})"
+                  onclick="approveRequest(${realIndex})"
                 >
                   APPROVE
                 </button>
 
                 <button
                   class="action reject"
-                  onclick="rejectRequest(${r.id})"
+                  onclick="rejectRequest(${realIndex})"
                 >
                   REJECT
                 </button>
-
               `
               : "-"
             }
@@ -1431,293 +1205,159 @@ async function loadWithdrawals(){
 
     </div>
   `;
+
 }
+
+
 /* =========================
    APPROVE
 ========================= */
 
-/* =========================
-   APPROVE REQUEST
-========================= */
+function approveRequest(index){
 
-async function approveRequest(id){
+  const requests =
+    getRequests();
 
-  const { data: request, error: requestError } =
-    await db
-      .from("requests")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+  const request =
+    requests[index];
 
-  if(requestError || !request){
 
-    console.error(
-      "GET REQUEST ERROR:",
-      requestError
-    );
-
-    alert("Request nahi mili.");
+  if(!request)
     return;
-  }
 
-  if(request.status !== "PENDING"){
 
-    alert("Ye request already process ho chuki hai.");
-    return;
-  }
+  request.status =
+    "APPROVED";
 
-  const { data: user, error: userError } =
-    await db
-      .from("users")
-      .select("*")
-      .eq("id", request.user_id)
-      .maybeSingle();
 
-  if(userError || !user){
+  /*
+    DEMO BALANCE UPDATE
 
-    console.error(
-      "GET USER ERROR:",
-      userError
-    );
+    Deposit approved:
+    amount is added to user balance.
 
-    alert("User nahi mila.");
-    return;
-  }
+    Withdrawal approved:
+    amount is deducted.
+  */
 
-  const amount =
-    Number(request.amount || 0);
+  const saved =
+    localStorage.getItem("jalwaUser");
 
-  let newBalance =
-    Number(user.balance || 0);
 
-  /* =========================
-     DEPOSIT
-  ========================= */
+  if(saved){
 
-  if(request.type === "Deposit"){
+    const user =
+      JSON.parse(saved);
 
-    newBalance =
-      newBalance + amount;
-  }
+    const amount =
+      Number(request.amount || 0);
 
-  /* =========================
-     WITHDRAWAL
-  ========================= */
 
-  if(request.type === "Withdrawal"){
+    if(request.type === "Deposit"){
 
-    if(newBalance < amount){
+      user.balance =
+      Number(user.balance || 0) + (amount * 0.25);
 
-      alert(
-        "User balance is insufficient for this withdrawal."
-      );
+    }
+if(request.type === "Deposit" && request.planNumber){
 
-      return;
+  localStorage.setItem(
+    "jalwa_plan_" + request.planNumber,
+    Date.now().toString()
+  );
+
+}
+
+    if(request.type === "Withdrawal"){
+
+      user.balance =
+        Math.max(
+          0,
+          Number(user.balance || 0) - amount
+        );
+
     }
 
-    newBalance =
-      newBalance - amount;
-  }
 
-  /* =========================
-     UPDATE USER BALANCE
-  ========================= */
-
-  const { error: balanceError } =
-    await db
-      .from("users")
-      .update({
-        balance: newBalance
-      })
-      .eq("id", user.id);
-
-  if(balanceError){
-
-    console.error(
-      "BALANCE UPDATE ERROR:",
-      balanceError
-    );
-
-    alert("Balance update nahi ho saka.");
-    return;
-  }
-
-  /* =========================
-     APPROVE REQUEST
-  ========================= */
-
-  const { error: approveError } =
-    await db
-      .from("requests")
-      .update({
-        status: "APPROVED"
-      })
-      .eq("id", id);
-
-  if(approveError){
-
-    console.error(
-      "APPROVE REQUEST ERROR:",
-      approveError
-    );
-
-    alert("Request approve nahi ho saki.");
-    return;
-  }
-
-  /* =========================
-     TRANSACTION
-  ========================= */
-
-  const { error: transactionError } =
-    await db
-      .from("transactions")
-      .insert({
-
-        user_id:
-          request.user_id,
-
-        type:
-          request.type,
-
-        amount:
-          amount,
-
-        status:
-          "completed",
-
-        description:
-          request.type === "Deposit"
-            ? "Deposit approved"
-            : "Withdrawal approved"
-
-      });
-
-  if(transactionError){
-
-    console.error(
-      "TRANSACTION ERROR:",
-      transactionError
+    localStorage.setItem(
+      "jalwaUser",
+      JSON.stringify(user)
     );
 
   }
 
-  /* =========================
-     REFRESH ADMIN PANEL
-  ========================= */
+
+  localStorage.setItem(
+    "jalwaRequests",
+    JSON.stringify(requests)
+  );
+
 
   loadDashboard();
   loadDeposits();
   loadWithdrawals();
   loadTransactions();
 
-  alert(
-    request.type +
-    " approved successfully."
-  );
+  alert("Request approved.");
+
 }
 
 
 /* =========================
-   REJECT REQUEST
+   REJECT
 ========================= */
 
-async function rejectRequest(id){
+function rejectRequest(index){
 
-  const { data: request, error: requestError } =
-    await db
-      .from("requests")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+  const requests =
+    getRequests();
 
-  if(requestError || !request){
 
-    console.error(
-      "GET REQUEST ERROR:",
-      requestError
-    );
-
-    alert("Request nahi mili.");
+  if(!requests[index])
     return;
-  }
 
-  if(request.status !== "PENDING"){
 
-    alert("Ye request already process ho chuki hai.");
-    return;
-  }
+  requests[index].status =
+    "REJECTED";
 
-  const { error } =
-    await db
-      .from("requests")
-      .update({
-        status: "REJECTED"
-      })
-      .eq("id", id);
 
-  if(error){
+  localStorage.setItem(
+    "jalwaRequests",
+    JSON.stringify(requests)
+  );
 
-    console.error(
-      "REJECT REQUEST ERROR:",
-      error
-    );
-
-    alert("Request reject nahi ho saki.");
-    return;
-  }
-
-  /* =========================
-     REFRESH ADMIN PANEL
-  ========================= */
 
   loadDashboard();
   loadDeposits();
   loadWithdrawals();
+  loadTransactions();
 
-  alert(
-    request.type +
-    " rejected successfully."
-  );
+  alert("Request rejected.");
+
 }
+
 
 /* =========================
    TRANSACTIONS
 ========================= */
 
-async function loadTransactions(){
+function loadTransactions(){
+
+  const requests =
+    getRequests();
 
   const box =
     document.getElementById("transactionsContent");
 
-  const { data: transactions, error } =
-    await db
-      .from("transactions")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
 
-  if(error){
-
-    console.error(
-      "SUPABASE TRANSACTIONS ERROR:",
-      error
-    );
-
-    box.innerHTML =
-      `<div class="empty">Transactions load nahi ho sakin.</div>`;
-
-    return;
-  }
-
-  if(!transactions || !transactions.length){
+  if(!requests.length){
 
     box.innerHTML =
       `<div class="empty">No transactions yet.</div>`;
 
     return;
   }
+
 
   box.innerHTML = `
 
@@ -1728,40 +1368,30 @@ async function loadTransactions(){
       <tr>
         <th>Type</th>
         <th>Amount</th>
+        <th>Method</th>
         <th>Status</th>
-        <th>Description</th>
         <th>Date</th>
       </tr>
 
-      ${transactions.map(t => `
+      ${requests.slice().reverse().map(r => `
 
         <tr>
 
-          <td>
-            ${t.type || "-"}
-          </td>
+          <td>${r.type}</td>
 
           <td>
-            Rs ${Number(t.amount || 0).toLocaleString()}
+            Rs ${Number(r.amount || 0).toLocaleString()}
           </td>
 
+          <td>${r.method || "-"}</td>
+
           <td>
-            <span class="badge ${String(t.status || "").toLowerCase()}">
-              ${t.status || "-"}
+            <span class="badge ${r.status.toLowerCase()}">
+              ${r.status}
             </span>
           </td>
 
-          <td>
-            ${t.description || "-"}
-          </td>
-
-          <td>
-            ${
-              t.created_at
-              ? new Date(t.created_at).toLocaleString()
-              : "-"
-            }
-          </td>
+          <td>${r.date || "-"}</td>
 
         </tr>
 
@@ -1771,127 +1401,191 @@ async function loadTransactions(){
 
     </div>
   `;
+
 }
+
+
 /* =========================
    NOTIFICATIONS
 ========================= */
 
-function sendNotification(){
-
-  const text =
-    document
-      .getElementById("notificationText")
-      .value.trim();
-
+async function sendNotification(){
+  const text = document.getElementById("notificationText").value.trim();
 
   if(!text){
-
-    alert("Write notification first.");
-
-    return;
+    return alert("Write notification first.");
   }
 
+  const { error } = await db
+    .from("notifications")
+    .insert([{ text: text }]);
 
-  const list =
-    JSON.parse(
-      localStorage.getItem("jalwaNotifications") || "[]"
-    );
+  if(error){
+    console.error(error);
+    return alert("Notification save failed: " + error.message);
+  }
 
-
-  list.push({
-    text:text,
-    date:new Date().toLocaleString()
-  });
-
-
-  localStorage.setItem(
-    "jalwaNotifications",
-    JSON.stringify(list)
-  );
-
-
-  document.getElementById("notificationText")
-    .value = "";
-
-
+  document.getElementById("notificationText").value = "";
+  alert("Notification sent successfully.");
   loadNotifications();
+}
 
-  alert("Notification saved.");
+async function loadNotifications(){
+  const box = document.getElementById("notificationList");
 
+  if(!box) return;
+
+  const { data, error } = await db
+    .from("notifications")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error(error);
+    box.innerHTML = "<p>Failed to load notifications.</p>";
+    return;
+  }
+
+  if(!data || data.length === 0){
+    box.innerHTML = "<p>No notifications yet.</p>";
+    return;
+  }
+
+  box.innerHTML = data.map(n => `
+    <div class="card">
+      <strong>${n.text}</strong>
+      <div style="font-size:12px;opacity:.7;margin-top:6px;">
+        ${new Date(n.created_at).toLocaleString()}
+      </div>
+    </div>
+  `).join("");
 }
 
 
-function loadNotifications(){
+async function saveSettings(){
 
-  const list =
-    JSON.parse(
-      localStorage.getItem("jalwaNotifications") || "[]"
-    );
+  const method =
+    document.getElementById("paymentMethod").value.trim();
+
+  const number =
+    document.getElementById("paymentNumber").value.trim();
+
+  const name =
+    document.getElementById("paymentName").value.trim();
 
 
-  const box =
-    document.getElementById("notificationList");
+  const { data: existing, error: readError } =
+    await db
+      .from("settings")
+      .select("id")
+      .order("id", { ascending: true })
+      .limit(1);
 
 
-  if(!list.length){
+  if(readError){
 
-    box.innerHTML =
-      `<div class="empty">No notifications.</div>`;
+    console.error(readError);
+
+    alert("Settings read failed: " + readError.message);
 
     return;
   }
 
 
-  box.innerHTML =
-    list.slice().reverse().map(n => `
-
-      <div class="panel">
-
-        <div style="color:#ffe09a;">
-          ${n.text}
-        </div>
-
-        <div style="font-size:10px;color:#9f896b;margin-top:6px;">
-          ${n.date}
-        </div>
-
-      </div>
-
-    `).join("");
-
-}
+  let result;
 
 
-/* =========================
-   SETTINGS
-========================= */
+  if(existing && existing.length > 0){
 
-function saveSettings(){
+    result = await db
+      .from("settings")
+      .update({
+        payment_method: method,
+        payment_number: number,
+        payment_name: name
+      })
+      .eq("id", existing[0].id);
 
-  const settings = {
+  }else{
 
-    method:
-      document.getElementById("paymentMethod").value,
+    result = await db
+      .from("settings")
+      .insert([{
+        payment_method: method,
+        payment_number: number,
+        payment_name: name
+      }]);
 
-    number:
-      document.getElementById("paymentNumber").value,
-
-    name:
-      document.getElementById("paymentName").value
-
-  };
-
-
-  localStorage.setItem(
-    "jalwaSettings",
-    JSON.stringify(settings)
-  );
+  }
 
 
-  alert("Settings saved.");
+  if(result.error){
+
+    console.error(result.error);
+
+    alert("Settings save failed: " + result.error.message);
+
+    return;
+  }
+
+
+  alert("Settings saved successfully.");
 
 }
 
+
+async function loadSettings(){
+
+  const { data, error } =
+    await db
+      .from("settings")
+      .select("*")
+      .order("id", { ascending: true })
+      .limit(1);
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+
+  if(!data || data.length === 0){
+
+    return;
+  }
+
+
+  const settings = data[0];
+
+
+  const method =
+    document.getElementById("paymentMethod");
+
+  const number =
+    document.getElementById("paymentNumber");
+
+  const name =
+    document.getElementById("paymentName");
+
+
+  if(method)
+    method.value =
+      settings.payment_method || "All Banks";
+
+
+  if(number)
+    number.value =
+      settings.payment_number || "";
+
+
+  if(name)
+    name.value =
+      settings.payment_name || "";
+
+}
 
 /* =========================
    START
@@ -1906,41 +1600,18 @@ window.addEventListener("load",() => {
   if(logged === "true"){
 
     showAdmin();
+    loadSettings();
 
   }
 
 });
 
 </script>
-<div id="imageModal" class="image-modal hidden" onclick="closeImageModal()">
 
-  <div
-    class="image-modal-box"
-    onclick="event.stopPropagation()"
-  >
-
-    <button
-      class="close-image"
-      onclick="closeImageModal()"
-    >
-      ×
-    </button>
-
-    <div
-      id="imageTitle"
-      class="image-title"
-    >
-      Deposit Screenshot
-    </div>
-
-    <img
-      id="imagePreview"
-      src=""
-      alt="Deposit Screenshot"
-    >
-
-  </div>
-
-</div>
 </body>
 </html>
+
+
+
+
+
