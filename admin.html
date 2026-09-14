@@ -397,56 +397,56 @@ td{
       class="menu-btn active"
       onclick="showSection('dashboard',this)"
     >
-      📊 Dashboard
+      Dashboard
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('users',this)"
     >
-      👥 Users
+      Users
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('deposits',this)"
     >
-      💰 Deposits
+      Deposits
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('withdrawals',this)"
     >
-      💸 Withdrawals
+      Withdrawals
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('transactions',this)"
     >
-      💳 Transactions
+      Transactions
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('notifications',this)"
     >
-      🔔 Notifications
+      Notifications
     </button>
 
     <button
       class="menu-btn"
       onclick="showSection('settings',this)"
     >
-      ⚙️ Settings
+      Settings
     </button>
 
     <button
       class="menu-btn logout"
       onclick="adminLogout()"
     >
-      🚪 Logout
+      Logout
     </button>
 
   </aside>
@@ -676,6 +676,7 @@ function adminLogin(){
     );
 
     showAdmin();
+    loadSettings();
 
   }else{
 
@@ -884,16 +885,32 @@ function loadDashboard(){
    USERS
 ========================= */
 
-function loadUsers(){
-
-  const saved =
-    localStorage.getItem("jalwaUser");
+async function loadUsers(){
 
   const box =
     document.getElementById("usersContent");
 
+  if(!box){
+    return;
+  }
 
-  if(!saved){
+  const { data: users, error } =
+    await db
+      .from("users")
+      .select("*")
+      .order("created_at", { ascending:false });
+
+  if(error){
+
+    console.error("USERS LOAD ERROR:", error);
+
+    box.innerHTML =
+      `<div class="empty">Failed to load users.</div>`;
+
+    return;
+  }
+
+  if(!users || users.length === 0){
 
     box.innerHTML =
       `<div class="empty">No users found.</div>`;
@@ -901,101 +918,57 @@ function loadUsers(){
     return;
   }
 
-
-  const user =
-    JSON.parse(saved);
-
-
   box.innerHTML = `
 
     <div class="table-wrap">
 
-    <table>
+      <table>
 
-      <tr>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Balance</th>
-        <th>Referral</th>
-        <th>Action</th>
-      </tr>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Balance</th>
+          <th>Referral</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
 
-      <tr>
+        ${users.map(user => `
 
-        <td>${user.name || "-"}</td>
+          <tr>
 
-        <td>${user.phone || "-"}</td>
+            <td>${user.name || "-"}</td>
 
-        <td>
-          Rs ${Number(user.balance || 0).toLocaleString()}
-        </td>
+            <td>${user.phone || "-"}</td>
 
-        <td>${user.referral || "-"}</td>
+            <td>
+              Rs ${Number(user.balance || 0).toLocaleString()}
+            </td>
 
-        <td>
-          <button
-            class="action block"
-            onclick="adjustBalance()"
-          >
-            Balance
-          </button>
-        </td>
+            <td>${user.referral || "-"}</td>
 
-      </tr>
+            <td>
+              ${user.blocked ? "BLOCKED" : "ACTIVE"}
+            </td>
 
-    </table>
+            <td>
+              <button
+                class="action block"
+                onclick="adjustBalance('${user.id}')"
+              >
+                Balance
+              </button>
+            </td>
+
+          </tr>
+
+        `).join("")}
+
+      </table>
 
     </div>
   `;
-
 }
-
-
-function adjustBalance(){
-
-  const amount =
-    prompt("Enter new balance:");
-
-  if(amount === null)
-    return;
-
-  const value =
-    Number(amount);
-
-  if(isNaN(value) || value < 0){
-
-    alert("Invalid balance.");
-
-    return;
-  }
-
-
-  const saved =
-    localStorage.getItem("jalwaUser");
-
-  if(!saved) return;
-
-
-  const user =
-    JSON.parse(saved);
-
-  user.balance = value;
-
-
-  localStorage.setItem(
-    "jalwaUser",
-    JSON.stringify(user)
-  );
-
-
-  loadUsers();
-
-  loadDashboard();
-
-  alert("Balance updated.");
-
-}
-
 
 /* =========================
    DEPOSITS
@@ -1408,122 +1381,183 @@ function loadTransactions(){
    NOTIFICATIONS
 ========================= */
 
-function sendNotification(){
-
-  const text =
-    document
-      .getElementById("notificationText")
-      .value.trim();
-
+async function sendNotification(){
+  const text = document.getElementById("notificationText").value.trim();
 
   if(!text){
-
-    alert("Write notification first.");
-
-    return;
+    return alert("Write notification first.");
   }
 
+  const { error } = await db
+    .from("notifications")
+    .insert([{ text: text }]);
 
-  const list =
-    JSON.parse(
-      localStorage.getItem("jalwaNotifications") || "[]"
-    );
+  if(error){
+    console.error(error);
+    return alert("Notification save failed: " + error.message);
+  }
 
-
-  list.push({
-    text:text,
-    date:new Date().toLocaleString()
-  });
-
-
-  localStorage.setItem(
-    "jalwaNotifications",
-    JSON.stringify(list)
-  );
-
-
-  document.getElementById("notificationText")
-    .value = "";
-
-
+  document.getElementById("notificationText").value = "";
+  alert("Notification sent successfully.");
   loadNotifications();
+}
 
-  alert("Notification saved.");
+async function loadNotifications(){
+  const box = document.getElementById("notificationList");
 
+  if(!box) return;
+
+  const { data, error } = await db
+    .from("notifications")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error(error);
+    box.innerHTML = "<p>Failed to load notifications.</p>";
+    return;
+  }
+
+  if(!data || data.length === 0){
+    box.innerHTML = "<p>No notifications yet.</p>";
+    return;
+  }
+
+  box.innerHTML = data.map(n => `
+    <div class="card">
+      <strong>${n.text}</strong>
+      <div style="font-size:12px;opacity:.7;margin-top:6px;">
+        ${new Date(n.created_at).toLocaleString()}
+      </div>
+    </div>
+  `).join("");
 }
 
 
-function loadNotifications(){
+async function saveSettings(){
 
-  const list =
-    JSON.parse(
-      localStorage.getItem("jalwaNotifications") || "[]"
-    );
+  const method =
+    document.getElementById("paymentMethod").value.trim();
+
+  const number =
+    document.getElementById("paymentNumber").value.trim();
+
+  const name =
+    document.getElementById("paymentName").value.trim();
 
 
-  const box =
-    document.getElementById("notificationList");
+  const { data: existing, error: readError } =
+    await db
+      .from("settings")
+      .select("id")
+      .order("id", { ascending: true })
+      .limit(1);
 
 
-  if(!list.length){
+  if(readError){
 
-    box.innerHTML =
-      `<div class="empty">No notifications.</div>`;
+    console.error(readError);
+
+    alert("Settings read failed: " + readError.message);
 
     return;
   }
 
 
-  box.innerHTML =
-    list.slice().reverse().map(n => `
-
-      <div class="panel">
-
-        <div style="color:#ffe09a;">
-          ${n.text}
-        </div>
-
-        <div style="font-size:10px;color:#9f896b;margin-top:6px;">
-          ${n.date}
-        </div>
-
-      </div>
-
-    `).join("");
-
-}
+  let result;
 
 
-/* =========================
-   SETTINGS
-========================= */
+  if(existing && existing.length > 0){
 
-function saveSettings(){
+    result = await db
+      .from("settings")
+      .update({
+        payment_method: method,
+        payment_number: number,
+        payment_name: name
+      })
+      .eq("id", existing[0].id);
 
-  const settings = {
+  }else{
 
-    method:
-      document.getElementById("paymentMethod").value,
+    result = await db
+      .from("settings")
+      .insert([{
+        payment_method: method,
+        payment_number: number,
+        payment_name: name
+      }]);
 
-    number:
-      document.getElementById("paymentNumber").value,
-
-    name:
-      document.getElementById("paymentName").value
-
-  };
-
-
-  localStorage.setItem(
-    "jalwaSettings",
-    JSON.stringify(settings)
-  );
+  }
 
 
-  alert("Settings saved.");
+  if(result.error){
+
+    console.error(result.error);
+
+    alert("Settings save failed: " + result.error.message);
+
+    return;
+  }
+
+
+  alert("Settings saved successfully.");
 
 }
 
+
+async function loadSettings(){
+
+  const { data, error } =
+    await db
+      .from("settings")
+      .select("*")
+      .order("id", { ascending: true })
+      .limit(1);
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+
+  if(!data || data.length === 0){
+
+    return;
+  }
+
+
+  const settings = data[0];
+
+
+  const method =
+    document.getElementById("paymentMethod");
+
+  const number =
+    document.getElementById("paymentNumber");
+
+  const name =
+    document.getElementById("paymentName");
+
+
+  if(method)
+    method.value =
+      settings.payment_method || "All Banks";
+
+
+  if(number)
+    number.value =
+      settings.payment_number || "";
+
+
+  if(name)
+    name.value =
+      settings.payment_name || "";
+
+}
 
 /* =========================
    START
@@ -1538,6 +1572,7 @@ window.addEventListener("load",() => {
   if(logged === "true"){
 
     showAdmin();
+    loadSettings();
 
   }
 
@@ -1547,3 +1582,9 @@ window.addEventListener("load",() => {
 
 </body>
 </html>
+
+
+
+
+
+
