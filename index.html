@@ -855,7 +855,7 @@ main{
         class="icon-btn"
         onclick="openMenu()"
       >
-        ☰
+        ???
       </button>
 
       <div class="brand">
@@ -902,7 +902,7 @@ main{
           style="margin-top:15px;"
           onclick="installApp()"
         >
-          📲 INSTALL APP
+          ???? INSTALL APP
         </button>
 
       </div>
@@ -934,7 +934,7 @@ main{
           class="round-action"
           onclick="openRequest('deposit')"
         >
-          <span>＋</span>
+          <span>???</span>
           DEPOSIT
         </button>
 
@@ -942,7 +942,7 @@ main{
           class="round-action"
           onclick="openRequest('withdraw')"
         >
-          <span>↗</span>
+          <span>???</span>
           WITHDRAW
         </button>
 
@@ -1197,7 +1197,7 @@ main{
     >
 
       <span class="nav-icon">
-        ⌂
+        ???
       </span>
 
       Home
@@ -1211,7 +1211,7 @@ main{
     >
 
       <span class="nav-icon">
-        ＋
+        ???
       </span>
 
       Deposit
@@ -1225,7 +1225,7 @@ main{
     >
 
       <span class="nav-icon">
-        ▣
+        ???
       </span>
 
       Plans
@@ -1239,7 +1239,7 @@ main{
     >
 
       <span class="nav-icon">
-        ↗
+        ???
       </span>
 
       Withdraw
@@ -1253,7 +1253,7 @@ main{
     >
 
       <span class="nav-icon">
-        ♙
+        ???
       </span>
 
       Account
@@ -1287,7 +1287,7 @@ main{
     class="menu-close"
     onclick="closeMenu()"
   >
-    ×
+    ??
   </button>
 
   <div class="menu-title">
@@ -1299,7 +1299,7 @@ main{
     class="menu-item"
     onclick="scrollToSection('homeSection')"
   >
-    🏠 Home
+    ???? Home
   </button>
 
 
@@ -1307,7 +1307,7 @@ main{
     class="menu-item"
     onclick="openRequest('deposit');closeMenu()"
   >
-    💰 Deposit
+    ???? Deposit
   </button>
 
 
@@ -1315,7 +1315,7 @@ main{
     class="menu-item"
     onclick="openRequest('withdraw');closeMenu()"
   >
-    💸 Withdraw
+    ???? Withdraw
   </button>
 
 
@@ -1323,7 +1323,7 @@ main{
     class="menu-item"
     onclick="scrollToSection('myPackagesSection')"
   >
-    📦 My Packages
+    ???? My Packages
   </button>
 
 
@@ -1331,7 +1331,7 @@ main{
     class="menu-item"
     onclick="scrollToSection('plansSection')"
   >
-    📦 Plans
+    ???? Plans
   </button>
 
 
@@ -1339,7 +1339,7 @@ main{
     class="menu-item"
     onclick="openHistory()"
   >
-    📋 Request Status
+    ???? Request Status
   </button>
 
 
@@ -1347,7 +1347,7 @@ main{
     class="menu-item"
     onclick="contactAdmin()"
   >
-    👤 Contact Admin
+    ???? Contact Admin
   </button>
 
 
@@ -1355,7 +1355,7 @@ main{
     class="menu-item"
     onclick="joinChannel()"
   >
-    📢 Join Channel
+    ???? Join Channel
   </button>
 
 
@@ -1363,7 +1363,7 @@ main{
     class="menu-item"
     onclick="showAccount()"
   >
-    ⚙️ Account
+    ?????? Account
   </button>
 
 
@@ -1371,7 +1371,7 @@ main{
     class="menu-item"
     onclick="logout()"
   >
-    🚪 Logout
+    ???? Logout
   </button>
 
 </aside>
@@ -2577,7 +2577,7 @@ function renderMyPackages(){
         <div class="package-box-title">
 
           JALWA-${String(number).padStart(2,"0")}
-          — PACKAGE
+          ??? PACKAGE
 
         </div>
 
@@ -2901,7 +2901,7 @@ function renderPlans(){
 
             : savedStart
 
-              ? "Approved — " +
+              ? "Approved ??? " +
                 countdownText(
                   savedStart,
                   days
@@ -2989,13 +2989,13 @@ function populateApproval(){
 
         `JALWA-${String(number).padStart(2,"0")}` +
 
-        ` — Rs ${amount.toLocaleString()}` +
+        ` ??? Rs ${amount.toLocaleString()}` +
 
         (
 
           approved
 
-          ? " — APPROVED"
+          ? " ??? APPROVED"
 
           : ""
 
@@ -3223,7 +3223,7 @@ function updateTimers(){
 
 
       status.textContent =
-        "Approved — " +
+        "Approved ??? " +
         countdownText(
           start,
           days
@@ -3609,7 +3609,7 @@ async function submitRequest(){
     renderRequestHistory();
 
     toast(
-      "Deposit request submitted — PENDING."
+      "Deposit request submitted ??? PENDING."
     );
 
     console.log(
@@ -3751,7 +3751,7 @@ async function submitRequest(){
   renderRequestHistory();
 
   toast(
-    "Withdrawal request submitted — PENDING."
+    "Withdrawal request submitted ??? PENDING."
   );
 
 
@@ -4039,138 +4039,121 @@ function copyRef(){
    REQUEST HISTORY
 ========================= */
 
-function renderRequestHistory(){
+async function renderRequestHistory(){
 
-  const box =
-    document.getElementById(
-      "requestHistory"
-    );
-
+  const box = document.getElementById("requestHistory");
 
   if(!box){
     return;
   }
 
+  let user = null;
 
-  const requests =
-    JSON.parse(
-
-      localStorage.getItem(
-        "jalwaRequests"
-      ) || "[]"
-
+  try{
+    user = JSON.parse(
+      localStorage.getItem("jalwaUser") || "null"
     );
+  }catch(error){
+    console.error("USER DATA ERROR:", error);
+  }
 
-
-  if(
-    !requests.length
-  ){
+  if(!user || !user.id){
 
     box.innerHTML = `
-
-      <div
-        class="info-card"
-        style="
-          text-align:center;
-          color:#cdb184;
-        "
-      >
-
-        No requests yet.
-
+      <div class="info-card"
+        style="text-align:center;color:#cdb184;">
+        Please login first.
       </div>
-
     `;
 
     return;
-
   }
 
+  const { data: requests, error } = await db
+    .from("requests")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending:false });
+
+  if(error){
+
+    console.error("REQUEST HISTORY ERROR:", error);
+
+    box.innerHTML = `
+      <div class="info-card"
+        style="text-align:center;color:#cdb184;">
+        Could not load request status.
+      </div>
+    `;
+
+    return;
+  }
+
+  if(!requests || !requests.length){
+
+    box.innerHTML = `
+      <div class="info-card"
+        style="text-align:center;color:#cdb184;">
+        No requests yet.
+      </div>
+    `;
+
+    return;
+  }
 
   box.innerHTML = "";
 
+  requests.forEach(r => {
 
-  requests
-    .slice()
-    .reverse()
-    .forEach(
-      r => {
+    const item = document.createElement("div");
 
+    item.className = "request-item";
 
-        const item =
-          document.createElement(
-            "div"
-          );
+    item.innerHTML = `
 
+      <b>${r.type || "-"}</b>
+      ? Rs ${Number(r.amount || 0).toLocaleString()}
 
-        item.className =
-          "request-item";
+      <br>
 
+      Status:
+      <span style="color:#ffd54a">
+        ${r.status || "PENDING"}
+      </span>
 
-        item.innerHTML = `
+      <br>
 
-          <b>
-            ${r.type}
-          </b>
+      Method:
+      ${r.method || "-"}
 
-          —
-          Rs
-          ${Number(
-            r.amount || 0
-          ).toLocaleString()}
-
-          <br>
-
-          Status:
-          <span
-            style="color:#ffd54a"
-          >
-            ${r.status}
-          </span>
-
-          <br>
-
-          Method:
-          ${r.method || "-"}
-
-          <br>
-
-          ${
-            r.type === "Deposit" &&
-            r.screenshotName
-
-              ? "Screenshot: " +
-                r.screenshotName +
-                "<br>"
-
-              : ""
-          }
-
-          ${
-            r.type === "Withdrawal"
-
-              ? "Account: " +
-                (r.account || "-") +
-                "<br>"
-
-              : ""
-          }
-
-          Date:
-          ${r.date || "-"}
-
-        `;
-
-
-        box.appendChild(
-          item
-        );
-
+      ${
+        r.type === "Withdrawal"
+          ? `<br>Account: ${r.phone || "-"}`
+          : ""
       }
-    );
+
+      ${
+        r.type === "Deposit" && r.screenshot
+          ? `<br>Screenshot: Submitted`
+          : ""
+      }
+
+      <br>
+
+      Date:
+      ${
+        r.created_at
+          ? new Date(r.created_at).toLocaleString()
+          : "-"
+      }
+
+    `;
+
+    box.appendChild(item);
+
+  });
 
 }
-
 
 /* =========================
    REQUEST HISTORY OPEN
@@ -4513,3 +4496,4 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 </body>
 </html>
+
