@@ -703,6 +703,26 @@ main{
 
 }
 
+
+/* JALWA CLEAN ICONS */
+.jalwa-icon{
+  width:20px;
+  height:20px;
+  display:inline-block;
+  vertical-align:middle;
+  stroke:currentColor;
+  stroke-width:2;
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.nav-icon .jalwa-icon{width:21px;height:21px;}
+.menu-item .jalwa-icon{width:19px;height:19px;margin-right:9px;}
+.round-action .jalwa-icon{width:22px;height:22px;margin-bottom:3px;}
+.icon-btn .jalwa-icon{width:21px;height:21px;}
+.gold-btn .jalwa-icon{width:18px;height:18px;margin-right:7px;}
+.menu-close .jalwa-icon{width:20px;height:20px;}
+
 </style>
 </head>
 
@@ -855,7 +875,7 @@ main{
         class="icon-btn"
         onclick="openMenu()"
       >
-        ???
+        <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
       </button>
 
       <div class="brand">
@@ -902,7 +922,7 @@ main{
           style="margin-top:15px;"
           onclick="installApp()"
         >
-          ???? INSTALL APP
+          <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> INSTALL APP
         </button>
 
       </div>
@@ -934,7 +954,7 @@ main{
           class="round-action"
           onclick="openRequest('deposit')"
         >
-          <span>???</span>
+          <span><svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>
           DEPOSIT
         </button>
 
@@ -942,7 +962,7 @@ main{
           class="round-action"
           onclick="openRequest('withdraw')"
         >
-          <span>???</span>
+          <span><svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></span>
           WITHDRAW
         </button>
 
@@ -1197,7 +1217,7 @@ main{
     >
 
       <span class="nav-icon">
-        ???
+        <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>
       </span>
 
       Home
@@ -1211,7 +1231,7 @@ main{
     >
 
       <span class="nav-icon">
-        ???
+        <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
       </span>
 
       Deposit
@@ -1225,7 +1245,7 @@ main{
     >
 
       <span class="nav-icon">
-        ???
+        <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m16.5 9.4-9-5.19"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
       </span>
 
       Plans
@@ -1239,7 +1259,7 @@ main{
     >
 
       <span class="nav-icon">
-        ???
+        <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
       </span>
 
       Withdraw
@@ -1253,7 +1273,7 @@ main{
     >
 
       <span class="nav-icon">
-        ???
+        <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
       </span>
 
       Account
@@ -1287,7 +1307,7 @@ main{
     class="menu-close"
     onclick="closeMenu()"
   >
-    ??
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
   </button>
 
   <div class="menu-title">
@@ -1299,7 +1319,7 @@ main{
     class="menu-item"
     onclick="scrollToSection('homeSection')"
   >
-    ???? Home
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg> Home
   </button>
 
 
@@ -1307,7 +1327,7 @@ main{
     class="menu-item"
     onclick="openRequest('deposit');closeMenu()"
   >
-    ???? Deposit
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h15a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M2 8h17"/><path d="M16 13h3"/></svg> Deposit
   </button>
 
 
@@ -1315,7 +1335,7 @@ main{
     class="menu-item"
     onclick="openRequest('withdraw');closeMenu()"
   >
-    ???? Withdraw
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg> Withdraw
   </button>
 
 
@@ -1323,7 +1343,7 @@ main{
     class="menu-item"
     onclick="scrollToSection('myPackagesSection')"
   >
-    ???? My Packages
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m16.5 9.4-9-5.19"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg> My Packages
   </button>
 
 
@@ -1331,7 +1351,7 @@ main{
     class="menu-item"
     onclick="scrollToSection('plansSection')"
   >
-    ???? Plans
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m16.5 9.4-9-5.19"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg> Plans
   </button>
 
 
@@ -1339,7 +1359,7 @@ main{
     class="menu-item"
     onclick="openHistory()"
   >
-    ???? Request Status
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2"/><path d="M9 10h6M9 14h6M9 18h4"/></svg> Request Status
   </button>
 
 
@@ -1347,7 +1367,7 @@ main{
     class="menu-item"
     onclick="contactAdmin()"
   >
-    ???? Contact Admin
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Contact Admin
   </button>
 
 
@@ -1355,7 +1375,7 @@ main{
     class="menu-item"
     onclick="joinChannel()"
   >
-    ???? Join Channel
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-5v12L3 13v-2Z"/><path d="M11.6 15.6 13 21H9l-2-7"/></svg> Join Channel
   </button>
 
 
@@ -1363,7 +1383,7 @@ main{
     class="menu-item"
     onclick="showAccount()"
   >
-    ?????? Account
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.04 1.56V20h-2.68v-.09a1.7 1.7 0 0 0-1.04-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.76 15a1.7 1.7 0 0 0-1.56-1.04H6v-2.68h.2A1.7 1.7 0 0 0 7.76 10a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12.24 5H12V2.9h2.68V5a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06A1.7 1.7 0 0 0 19.16 10c.22.64.82 1.04 1.5 1.04H21v2.68h-.2A1.7 1.7 0 0 0 19.4 15Z"/></svg> Account
   </button>
 
 
@@ -1371,7 +1391,7 @@ main{
     class="menu-item"
     onclick="logout()"
   >
-    ???? Logout
+    <svg class="jalwa-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg> Logout
   </button>
 
 </aside>
@@ -2577,7 +2597,7 @@ function renderMyPackages(){
         <div class="package-box-title">
 
           JALWA-${String(number).padStart(2,"0")}
-          ??? PACKAGE
+          â€” PACKAGE
 
         </div>
 
@@ -2901,7 +2921,7 @@ function renderPlans(){
 
             : savedStart
 
-              ? "Approved ??? " +
+              ? "Approved â€” " +
                 countdownText(
                   savedStart,
                   days
@@ -2989,13 +3009,13 @@ function populateApproval(){
 
         `JALWA-${String(number).padStart(2,"0")}` +
 
-        ` ??? Rs ${amount.toLocaleString()}` +
+        ` â€” Rs ${amount.toLocaleString()}` +
 
         (
 
           approved
 
-          ? " ??? APPROVED"
+          ? " â€” APPROVED"
 
           : ""
 
@@ -3223,7 +3243,7 @@ function updateTimers(){
 
 
       status.textContent =
-        "Approved ??? " +
+        "Approved â€” " +
         countdownText(
           start,
           days
@@ -3609,7 +3629,7 @@ async function submitRequest(){
     renderRequestHistory();
 
     toast(
-      "Deposit request submitted ??? PENDING."
+      "Deposit request submitted â€” PENDING."
     );
 
     console.log(
@@ -3751,7 +3771,7 @@ async function submitRequest(){
   renderRequestHistory();
 
   toast(
-    "Withdrawal request submitted ??? PENDING."
+    "Withdrawal request submitted â€” PENDING."
   );
 
 
@@ -4112,7 +4132,7 @@ async function renderRequestHistory(){
     item.innerHTML = `
 
       <b>${r.type || "-"}</b>
-      ? Rs ${Number(r.amount || 0).toLocaleString()}
+      — Rs ${Number(r.amount || 0).toLocaleString()}
 
       <br>
 
@@ -4496,5 +4516,4 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 </body>
 </html>
-
 
